@@ -12,13 +12,13 @@ public class ThirdPartyPolicy extends InsurancePolicy {
     @Override
     public void print() {
         super.print();
-        System.out.print("Comments:" + this.comments);
+        System.out.print("    Comments: " + this.comments);
         System.out.println();
     }
 
     @Override
     public String toString() {
-        return super.toString() + " Comments:" + this.comments;
+        return super.toString() + "  Comments: " + this.comments;
     }
 
     @Override

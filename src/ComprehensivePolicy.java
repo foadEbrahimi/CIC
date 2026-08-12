@@ -18,13 +18,13 @@ public class ComprehensivePolicy extends InsurancePolicy {
     @Override
     public void print() {
         super.print();
-        System.out.print("DriverAge:" + this.driverAge + "\nLevel:" + this.level);
-        System.out.println("\n");
+        System.out.print("    DriverAge:" + this.driverAge + "\n    Level:    " + this.level);
+        System.out.println();
     }
 
     @Override
     public String toString() {
-        return super.toString() + " DriverAge:" + this.driverAge + " Level:" + this.level;
+        return super.toString() + "  DriverAge:" + this.driverAge + "\n  Level:" + this.level;
     }
 
     @Override
