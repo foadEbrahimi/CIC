@@ -37,47 +37,48 @@ public class Program {
                 3,
                 "Standard third-party policy");
 
-        InsurancePolicy insurance4 = new ComprehensivePolicy(
-                "Reza Hoseini",
-                04,
-                car3,
-                3,
-                "Cost more than I was exepted",
-                55,
-                10);
-
         // add policies to the user policies
         addPolicy(user, insurance1);
         addPolicy(user, insurance2);
         addPolicy(user, insurance3);
-        addPolicy(user, insurance4);
 
+        System.out.println("---- print ----");
         user.print();
 
-        InsurancePolicy wrongID = findPolicy(user, 6);
-        if (wrongID != null) {
-            wrongID.print();
+        System.out.println("---- print with toString ----");
+        System.out.println(user);
+
+        InsurancePolicy wrongFindID = findPolicy(user, 6);
+        if (wrongFindID != null) {
+            wrongFindID.print();
         } else {
             System.out.println("Policy has not been found");
         }
 
-        InsurancePolicy correctID = findPolicy(user, 1);
-        if (correctID != null) {
-            correctID.print();
-            correctID.carPriceRise(0.1);
-            correctID.print();
-            if (!correctID.setPolicyHolderName("Robert")) {
+        InsurancePolicy correctFindID = findPolicy(user, 1);
+        if (correctFindID != null) {
+            System.out.println("---- print before rise ----");
+            correctFindID.print();
+            correctFindID.carPriceRise(0.1);
+            System.out.println("---- print after rise ----");
+            correctFindID.print();
+            if (!correctFindID.setPolicyHolderName("Robert")) {
                 System.out.println("The PolicyHolderName can not be empty!");
             }
-            correctID.setCarModel("Toyota Camry 2018");
+            correctFindID.setCarModel("Toyota Camry 2018");
         }
 
+        user.setCity("Wollongong");
+
+        System.out.println("---- change Address ----");
         changeAddress(user, inputReader);
 
+        System.out.println("---- calcTotalPremiumPayments ----");
         calcTotalPremiumPayments(user);
         user.carPriceRiseAll(0.1);
         calcTotalPremiumPayments(user);
 
+        System.out.println("---- filterByCarModel ----");
         filterByCarModel(user, inputReader);
     }
 
@@ -127,6 +128,10 @@ public class Program {
         System.out.print("Enter a car model for Filter the list: ");
         String carName = inputReader.nextLine();
         ArrayList<InsurancePolicy> filteredList = user.filterByCarModel(carName);
-        InsurancePolicy.printPolicies(filteredList);
+        if (filteredList.isEmpty()) {
+            System.out.println("No Policy matched with your input.");
+        } else {
+            InsurancePolicy.printPolicies(filteredList);
+        }
     }
 }

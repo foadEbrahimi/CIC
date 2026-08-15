@@ -112,13 +112,13 @@ public abstract class InsurancePolicy {
     }
 
     static ArrayList<InsurancePolicy> filterByCarModel(ArrayList<InsurancePolicy> policies, String carModel) {
-        ArrayList<InsurancePolicy> filterdPolicies = new ArrayList<>();
+        ArrayList<InsurancePolicy> filteredList = new ArrayList<>();
         for (InsurancePolicy policy : policies) {
-            if (policy.car.getModel().toLowerCase().contains(carModel.toLowerCase())) {
-                filterdPolicies.add(policy);
+            if (policy.getCar().getModel().toLowerCase().contains(carModel.toLowerCase())) {
+                filteredList.add(policy);
             }
         }
-        return filterdPolicies;
+        return filteredList;
     }
 
     static boolean existsPolicy(ArrayList<InsurancePolicy> policies, int id) {
