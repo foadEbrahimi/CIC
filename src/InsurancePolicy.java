@@ -10,11 +10,12 @@ public abstract class InsurancePolicy {
     public InsurancePolicy(String policyHolderName,
             int id,
             Car car,
-            int numberOfClaims) {
+            int numberOfClaims, MyDate expiryDate) {
         this.policyHolderName = policyHolderName;
         this.id = id;
         this.car = car;
         this.numberOfClaims = numberOfClaims;
+        this.expiryDate = expiryDate;
     }
 
     public void print() {
@@ -23,6 +24,8 @@ public abstract class InsurancePolicy {
         System.out.println("    Car-Price:" + String.format("%.2f", this.car.getPrice()));
         System.out.println("    Holder:   " + this.policyHolderName);
         System.out.println("    Claims:   " + this.numberOfClaims);
+        System.out.println("    ExpiryDate:" + this.expiryDate.getYear() + "/"
+                + this.expiryDate.getMonth() + "/" + this.expiryDate.getDay());
     }
 
     // get methods
@@ -56,7 +59,7 @@ public abstract class InsurancePolicy {
     }
 
     public boolean setPolicyHolderName(String policyHolderName) {
-        if (!policyHolderName.isEmpty()) {
+        if (policyHolderName != null && !policyHolderName.trim().isEmpty()) {
             this.policyHolderName = policyHolderName;
             return true;
         }
@@ -128,6 +131,16 @@ public abstract class InsurancePolicy {
             }
         }
         return false;
+    }
+
+    static ArrayList<InsurancePolicy> filterByExpiryDate(ArrayList<InsurancePolicy> policies, MyDate date) {
+        ArrayList<InsurancePolicy> filteredList = new ArrayList<>();
+        for (InsurancePolicy policy : policies) {
+            if (policy.getExpiryDate().isExpired(date)) {
+                filteredList.add(policy);
+            }
+        }
+        return filteredList;
     }
 
     public abstract double calcPayment(double flatRate);

@@ -5,6 +5,9 @@ public class Address {
     private String city;
 
     public Address(int streetNum, String street, String suburb, String city) {
+        if (streetNum <= 0) {
+            throw new IllegalArgumentException("StreetNum can not be negative!");
+        }
         this.streetNum = streetNum;
         this.street = street;
         this.suburb = suburb;

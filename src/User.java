@@ -4,7 +4,7 @@ public class User {
     private String name;
     private int userID;
     private Address address;
-    ArrayList<InsurancePolicy> policies;
+    private ArrayList<InsurancePolicy> policies;
 
     public User(String name, int userID, Address address) {
         this.name = name;
@@ -40,8 +40,9 @@ public class User {
     }
 
     public boolean setAddress(Address address) {
-        if (address.getStreetNum() > 0 && !address.getStreet().isEmpty() && !address.getSuburb().isEmpty()
-                && !address.getCity().isEmpty()) {
+        if (address != null && address.getStreetNum() > 0 && !address.getStreet().trim().isEmpty()
+                && !address.getSuburb().trim().isEmpty()
+                && !address.getCity().trim().isEmpty()) {
             this.address = address;
             return true;
         }
@@ -72,8 +73,11 @@ public class User {
         return null;
     }
 
-    void printPolicies() {
-        InsurancePolicy.printPolicies(this.policies);
+    void printPolicies(int flatRate) {
+        for (InsurancePolicy policy : policies) {
+            policy.print();
+            System.out.println("    Premium:  " + String.format("%.2f", policy.calcPayment(flatRate)));
+        }
     }
 
     double calcTotalPremiums(int flatRate) {
@@ -88,6 +92,28 @@ public class User {
         return InsurancePolicy.filterByCarModel(this.policies, carModel);
     }
 
+    boolean createThirdPartyPolicy(String policyHolderName, int id, Car car, int numberOfClaims,
+            String comments, MyDate expirDate) {
+        if (addPolicy(new ThirdPartyPolicy(policyHolderName, id, car, numberOfClaims,
+                comments, expirDate))) {
+            return true;
+        }
+        return false;
+    }
+
+    boolean createComprehensivePolicy(String policyHolderName, int id, Car car, int numberOfClaims,
+            int driverAge, int level, MyDate expirDate) {
+        if (addPolicy(
+                new ComprehensivePolicy(policyHolderName, id, car, numberOfClaims, driverAge, level, expirDate))) {
+            return true;
+        }
+        return false;
+    }
+
+    ArrayList<InsurancePolicy> filterByExpiryDate(MyDate date) {
+        return InsurancePolicy.filterByExpiryDate(policies, date);
+    }
+
     public void print() {
         System.out.println("\n--- User Information ---");
         System.out.println("Name: " + this.name);
@@ -99,19 +125,18 @@ public class User {
             System.out.println("  No policies found.");
         else
             InsurancePolicy.printPolicies(policies);
-
     }
 
     @Override
     public String toString() {
-        String result = "Name: " + this.name + "\n"
-                + "User ID: " + this.userID + "\n"
-                + "Address: " + this.address.getCity() + "\n"
-                + "Policies:\n";
+        String result = "  Name: " + this.name + "\n"
+                + "  Address: " + this.address.getCity() + "\n"
+                + "  Policies:\n";
 
         for (InsurancePolicy policy : policies) {
-            result += "  " + policy.toString() + "\n";
+            result += "    " + policy.toString().replace("\n", "\n    ") + "\n";
         }
+
         return result;
     }
 }

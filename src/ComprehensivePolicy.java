@@ -5,8 +5,11 @@ public class ComprehensivePolicy extends InsurancePolicy {
     public ComprehensivePolicy(String policyHolderName,
             int id,
             Car car,
-            int numberOfClaims, String comments, int driverAge, int level) {
-        super(policyHolderName, id, car, numberOfClaims);
+            int numberOfClaims, int driverAge, int level, MyDate expiryDate) throws IllegalArgumentException {
+        super(policyHolderName, id, car, numberOfClaims, expiryDate);
+        if (driverAge <= 0) {
+            throw new IllegalArgumentException("Driver age must be greater than 0");
+        }
         this.driverAge = driverAge;
         this.level = level;
     }

@@ -30,7 +30,7 @@ public class Car {
 
     // set methods
     public boolean setModel(String model) {
-        if (!model.isEmpty()) {
+        if (model != null && !model.trim().isEmpty()) {
             this.model = model;
             return true;
         }

@@ -1,11 +1,20 @@
+import java.time.LocalDate;
+
 public class MyDate {
     private int year;
     private int month;
     private int day;
 
-    public MyDate(int year,
-            int month,
-            int day) {
+    public MyDate(int year, int month, int day) throws IllegalArgumentException {
+        if (year <= 0) {
+            throw new IllegalArgumentException("Year must be greater than 0");
+        }
+        if (month < 1 || month > 12) {
+            throw new IllegalArgumentException("Month must be between 1 and 12");
+        }
+        if (day < 1 || day > 31) {
+            throw new IllegalArgumentException("Day must be between 1 and 31");
+        }
         this.year = year;
         this.month = month;
         this.day = day;
@@ -47,5 +56,19 @@ public class MyDate {
             return true;
         }
         return false;
+    }
+
+    boolean isExpired(MyDate expiryDate) {
+        LocalDate currentDate = LocalDate.of(
+                this.getYear(),
+                this.getMonth(),
+                this.getDay());
+
+        LocalDate expiry = LocalDate.of(
+                expiryDate.getYear(),
+                expiryDate.getMonth(),
+                expiryDate.getDay());
+
+        return currentDate.isBefore(expiry);
     }
 }
