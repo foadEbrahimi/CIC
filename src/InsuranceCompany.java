@@ -98,7 +98,7 @@ public class InsuranceCompany {
 
     boolean addUser(User user) {
         if (user == null) {
-            throw new IllegalArgumentException(
+            throw new NullPointerException(
                     "User cannot be null.");
         }
         if (existsUser(user.getUserID())) {

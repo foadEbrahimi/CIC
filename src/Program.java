@@ -409,6 +409,8 @@ public class Program {
             return;
         } catch (IllegalArgumentException e) {
             System.err.println(e.getMessage());
+        } catch (NullPointerException e) {
+            System.err.println("Policy does not exists.");
         }
     }
 
