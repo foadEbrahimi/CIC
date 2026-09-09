@@ -1,18 +1,18 @@
 import java.util.ArrayList;
 
 public abstract class InsurancePolicy {
-    protected String policyHolderName;
+    private static int idCounter = 100;
     protected int id;
+    protected String policyHolderName;
     protected Car car;
     protected int numberOfClaims;
     protected MyDate expiryDate;
 
     public InsurancePolicy(String policyHolderName,
-            int id,
             Car car,
             int numberOfClaims, MyDate expiryDate) {
         this.policyHolderName = policyHolderName;
-        this.id = id;
+        this.id = idCounter++;
         this.car = car;
         this.numberOfClaims = numberOfClaims;
         this.expiryDate = expiryDate;

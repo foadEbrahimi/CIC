@@ -53,7 +53,7 @@ public class Car {
         return false;
     }
 
-    public boolean setManufacturingYear(int year) {
+    public boolean setManuFacturingYear(int year) {
         if (year > 0) {
             this.manuFacturingYear = year;
             return true;

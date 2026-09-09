@@ -2,10 +2,9 @@ public class ThirdPartyPolicy extends InsurancePolicy {
     private String comments;
 
     public ThirdPartyPolicy(String policyHolderName,
-            int id,
             Car car,
             int numberOfClaims, String comments, MyDate expiryDate) {
-        super(policyHolderName, id, car, numberOfClaims, expiryDate);
+        super(policyHolderName, car, numberOfClaims, expiryDate);
         this.comments = comments;
     }
 

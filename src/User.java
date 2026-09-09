@@ -1,14 +1,15 @@
 import java.util.ArrayList;
 
 public class User {
+    private static int idCounter = 0;
     private String name;
     private int userID;
     private Address address;
     private ArrayList<InsurancePolicy> policies;
 
-    public User(String name, int userID, Address address) {
+    public User(String name, Address address) {
         this.name = name;
-        this.userID = userID;
+        this.userID = idCounter++;
         this.address = address;
         this.policies = new ArrayList<>();
     }
@@ -75,7 +76,7 @@ public class User {
 
     void printPolicies(int flatRate) {
         for (InsurancePolicy policy : policies) {
-            policy.print();
+            // policy.print();
             System.out.println("    Premium:  " + String.format("%.2f", policy.calcPayment(flatRate)));
         }
     }
@@ -92,19 +93,19 @@ public class User {
         return InsurancePolicy.filterByCarModel(this.policies, carModel);
     }
 
-    boolean createThirdPartyPolicy(String policyHolderName, int id, Car car, int numberOfClaims,
+    boolean createThirdPartyPolicy(String policyHolderName, Car car, int numberOfClaims,
             String comments, MyDate expirDate) {
-        if (addPolicy(new ThirdPartyPolicy(policyHolderName, id, car, numberOfClaims,
+        if (addPolicy(new ThirdPartyPolicy(policyHolderName, car, numberOfClaims,
                 comments, expirDate))) {
             return true;
         }
         return false;
     }
 
-    boolean createComprehensivePolicy(String policyHolderName, int id, Car car, int numberOfClaims,
+    boolean createComprehensivePolicy(String policyHolderName, Car car, int numberOfClaims,
             int driverAge, int level, MyDate expirDate) {
         if (addPolicy(
-                new ComprehensivePolicy(policyHolderName, id, car, numberOfClaims, driverAge, level, expirDate))) {
+                new ComprehensivePolicy(policyHolderName, car, numberOfClaims, driverAge, level, expirDate))) {
             return true;
         }
         return false;
@@ -112,6 +113,79 @@ public class User {
 
     ArrayList<InsurancePolicy> filterByExpiryDate(MyDate date) {
         return InsurancePolicy.filterByExpiryDate(policies, date);
+    }
+
+    public boolean removePolicy(int policyID) {
+        for (InsurancePolicy policy : this.policies) {
+            if (policy.getId() == policyID) {
+                policies.remove(policy);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    ArrayList<String> populateDistinctCarModels() {
+        ArrayList<String> cars = new ArrayList<>();
+        for (InsurancePolicy policy : this.policies) {
+            if (!cars.contains(policy.getCar().getModel().toLowerCase())) {
+                cars.add(policy.getCar().getModel().toLowerCase());
+            } else
+                continue;
+        }
+        return cars;
+    }
+
+    public double getTotalCountForCarModel(String carModel) {
+        int count = 0;
+        for (InsurancePolicy policy : this.policies) {
+            if (policy.getCar().getModel().equalsIgnoreCase(carModel)) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    public double getTotalPaymentForCarModel(String carModel, int flatRate) {
+        double total = 0;
+        for (InsurancePolicy policy : this.policies) {
+            if (policy.getCar().getModel().equalsIgnoreCase(carModel)) {
+                total += policy.calcPayment(flatRate);
+            }
+        }
+        return total;
+    }
+
+    public ArrayList<Integer> getTotalCountPerCarModel(ArrayList<String> carModels) {
+        ArrayList<Integer> counts = new ArrayList<>();
+        for (String model : carModels) {
+            counts.add((int) getTotalCountForCarModel(model));
+        }
+        return counts;
+    }
+
+    public ArrayList<Double> getTotalPaymentPerCarModel(ArrayList<String> carModels, int flatRate) {
+        ArrayList<Double> payments = new ArrayList<>();
+        for (String model : carModels) {
+            payments.add(getTotalPaymentForCarModel(model, flatRate));
+        }
+        return payments;
+    }
+
+    public void reportPaymentsPerCarModel(ArrayList<String> carModels, ArrayList<Integer> counts,
+            ArrayList<Double> premiumPayments) {
+        System.out.printf("%-25s %-25s %-25s%n", "Car Model", "Total Premium Payment", "Average Premium Payment");
+
+        for (int i = 0; i < carModels.size(); i++) {
+            String model = carModels.get(i);
+            int count = counts.get(i);
+            double totalPayment = premiumPayments.get(i);
+            double average = 0;
+            if (count > 0) {
+                average = totalPayment / count;
+            }
+            System.out.printf("%-25s $%,.2f \t\t $%,.2f%n", model, totalPayment, average);
+        }
     }
 
     public void print() {
@@ -132,11 +206,9 @@ public class User {
         String result = "  Name: " + this.name + "\n"
                 + "  Address: " + this.address.getCity() + "\n"
                 + "  Policies:\n";
-
         for (InsurancePolicy policy : policies) {
             result += "    " + policy.toString().replace("\n", "\n    ") + "\n";
         }
-
         return result;
     }
 }

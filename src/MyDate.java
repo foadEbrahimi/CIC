@@ -69,6 +69,6 @@ public class MyDate {
                 expiryDate.getMonth(),
                 expiryDate.getDay());
 
-        return currentDate.isBefore(expiry);
+        return !currentDate.isAfter(expiry);
     }
 }

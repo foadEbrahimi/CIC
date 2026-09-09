@@ -51,4 +51,13 @@ public class Helper {
             System.out.println("Input cannot be empty.");
         }
     }
+
+    public static void clearConsole() {
+        System.out.print("\033[H\033[2J");
+    }
+
+    public static void pressAnyKey(Scanner inputReader) {
+        System.out.println("\nPlease press any key to continue...");
+        inputReader.nextLine();
+    }
 }
