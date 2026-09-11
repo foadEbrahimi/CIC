@@ -223,7 +223,6 @@ public class InsuranceCompany {
                 filteredPolicies.add(policy);
             }
         }
-
         return filteredPolicies;
     }
 
