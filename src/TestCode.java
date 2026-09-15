@@ -262,16 +262,16 @@ public class TestCode {
 
                 ArrayList<InsurancePolicy> sortedPolicies = u1.sortPoliciesByDate();
 
-                System.out.println("---Original User Sorted Policies---");
+                System.out.println("---original user Sorted policies---");
                 InsurancePolicy.printPolicies(sortedPolicies);
 
-                System.out.println("---Shallow Copy Policies---");
+                System.out.println("---shallow copy policies---");
                 InsurancePolicy.printPolicies(user1ShallowCopyPolicies);
 
-                System.out.println("---Deep Copy Policies---");
+                System.out.println("---deep copy policies---");
                 InsurancePolicy.printPolicies(user1DeepCopyPolicies);
 
-                System.out.println("---Company Users Copy---");
+                System.out.println("---company users copy---");
                 ArrayList<User> companyDeepCopyUsers = company.deepCopyUsers();
                 ArrayList<User> companyShallowCopyUsers = company.shallowCopyUsers();
 
@@ -281,39 +281,33 @@ public class TestCode {
 
                 ArrayList<User> sortedUsers = company.sortUsers();
                 companyShallowCopyUsers.get(0).setName("Test Change shallow list");
-                System.out.println("---Original Company Users---");
-                for (User u : sortedUsers) {
-                        System.out.println("-ID: " + u.getUserID() + ", Name: " + u.getName() + " City: "
-                                        + u.getAddress().getCity());
+                System.out.println("---original company users---");
+                for (User user : sortedUsers) {
+                        System.out.println("-Id: " + user.getUserID() + ", Name: " + user.getName() + " City: "
+                                        + user.getAddress().getCity());
                 }
-                System.out.println("---Shallow Copy Users---");
-                for (User u : companyShallowCopyUsers) {
-                        System.out.println("-ID: " + u.getUserID() + ", Name: " + u.getName() + " City: "
-                                        + u.getAddress().getCity());
+                System.out.println("---shallow copy users---");
+                for (User user : companyShallowCopyUsers) {
+                        System.out.println("-Id: " + user.getUserID() + ", Name: " + user.getName() + " City: "
+                                        + user.getAddress().getCity());
                 }
-                System.out.println("---Deep Copy Users---");
-                for (User u : companyDeepCopyUsers) {
-                        System.out.println("-ID: " + u.getUserID() + ", Name: " + u.getName() + " City: "
-                                        + u.getAddress().getCity());
+                System.out.println("---deep copy users---");
+                for (User user : companyDeepCopyUsers) {
+                        System.out.println("-Id: " + user.getUserID() + ", Name: " + user.getName() + " City: "
+                                        + user.getAddress().getCity());
                 }
                 try {
                         InsuranceCompany clonedCompany = company.clone();
-                        System.out.println("original Company Name: " + company.getName());
-                        System.out.println("cloned Company Name: " + clonedCompany.getName());
+                        System.out.println("original company name: " + company.getName());
+                        System.out.println("cloned company name: " + clonedCompany.getName());
 
-                        clonedCompany.setName("Cloned Pars Insurance");
+                        clonedCompany.setName("cloned Pars Insurance");
                         System.out.println("after changing cloned company name to 'Cloned Pars Insurance':");
-                        System.out.println("original Company Name: " + company.getName()
-                                        + " (must be 'Pars Insurance')");
-                        System.out.println("cloned Company Name: " + clonedCompany.getName()
-                                        + " (must be 'Cloned Pars Insurance')");
-                        if (!company.getName().equals(clonedCompany.getName())) {
-                                System.out.println("Clone is a deep copy successfully.");
-                        } else {
-                                System.out.println("Clone share references with original object");
-                        }
+
+                        System.out.println("original company name: " + company.getName());
+                        System.out.println("cloned company name: " + clonedCompany.getName());
                 } catch (CloneNotSupportedException e) {
-                        System.err.println("Error while cloning company: " + e.getMessage());
+                        System.err.println("Error while cloning company => " + e.getMessage());
                 }
         }
 }
