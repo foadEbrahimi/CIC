@@ -34,4 +34,14 @@ public class ComprehensivePolicy extends InsurancePolicy {
         double premium = this.car.getPrice() / 50 + this.getNumberOfClaims() * 200 + flatRate;
         return this.driverAge <= 30 ? premium + (30 - this.driverAge) * 50 : premium;
     }
+
+    // lab-4
+    public ComprehensivePolicy(ComprehensivePolicy policy) throws IllegalArgumentException, CloneNotSupportedException {
+        super(policy);
+        if (policy.driverAge <= 0) {
+            throw new IllegalArgumentException("Driver age must be greater than 0");
+        }
+        this.driverAge = policy.driverAge;
+        this.level = policy.level;
+    }
 }

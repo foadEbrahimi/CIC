@@ -3,7 +3,7 @@ import java.util.Scanner;
 
 public class Ui {
 
-    public static void coreTest(Scanner inputReader) {
+    public static void coreTest(Scanner inputReader) throws CloneNotSupportedException {
         InsuranceCompany company = new InsuranceCompany("Pars Insurance", "admin", "1234", 100);
         UiMethods.initializeSampleData(company);
         boolean loggedIn = false;
@@ -80,7 +80,7 @@ public class Ui {
         }
     }
 
-    public static void standardTest(Scanner inputReader) {
+    public static void standardTest(Scanner inputReader) throws CloneNotSupportedException {
         InsuranceCompany company = new InsuranceCompany("Pars Insurance", "admin", "1234", 100);
         UiMethods.initializeSampleData(company);
 
@@ -111,7 +111,7 @@ public class Ui {
         }
     }
 
-    public static void advanceTest(Scanner inputReader) {
+    public static void advanceTest(Scanner inputReader) throws CloneNotSupportedException {
         InsuranceCompany company = new InsuranceCompany("Pars Insurance", "admin", "1234", 100);
         UiMethods.initializeSampleData(company);
         boolean mainMenuRunning = true;
@@ -141,7 +141,7 @@ public class Ui {
         }
     }
 
-    private static void handleAdminLogin(InsuranceCompany company, Scanner inputReader, boolean isAdvanced) {
+    private static void handleAdminLogin(InsuranceCompany company, Scanner inputReader, boolean isAdvanced) throws CloneNotSupportedException {
         Helper.clearConsole();
         System.out.println("\n--- ADMIN LOGIN ---");
         String user = Helper.readNonEmptyString(inputReader, "Username: ");
@@ -180,7 +180,7 @@ public class Ui {
         }
     }
 
-    private static void standardAdminMenu(InsuranceCompany company, Scanner inputReader) {
+    private static void standardAdminMenu(InsuranceCompany company, Scanner inputReader) throws CloneNotSupportedException {
         boolean adminRunning = true;
         while (adminRunning) {
             Helper.clearConsole();
@@ -258,7 +258,7 @@ public class Ui {
         }
     }
 
-    private static void advancedAdminMenu(InsuranceCompany company, Scanner inputReader) {
+    private static void advancedAdminMenu(InsuranceCompany company, Scanner inputReader) throws CloneNotSupportedException {
         boolean adminRunning = true;
         while (adminRunning) {
             Helper.clearConsole();

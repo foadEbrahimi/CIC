@@ -1,6 +1,6 @@
 import java.util.ArrayList;
 
-public abstract class InsurancePolicy {
+public abstract class InsurancePolicy implements Cloneable, Comparable<InsurancePolicy> {
     private static int idCounter = 100;
     protected int id;
     protected String policyHolderName;
@@ -151,5 +151,46 @@ public abstract class InsurancePolicy {
                 + "  Holder:   " + this.policyHolderName + "\n"
                 + "  Car:      " + this.car.model + "\n"
                 + "  Claims:   " + this.numberOfClaims + "\n";
+    }
+
+    // lab-4
+    public InsurancePolicy(InsurancePolicy policy) throws CloneNotSupportedException {
+        this.policyHolderName = policy.policyHolderName;
+        this.id = idCounter++;
+        this.car = policy.car.clone();
+        this.numberOfClaims = policy.numberOfClaims;
+        this.expiryDate = policy.expiryDate.clone();
+    }
+
+    @Override
+    public InsurancePolicy clone() throws CloneNotSupportedException {
+        InsurancePolicy clonedPolicy = (InsurancePolicy) super.clone();
+        if (this.car != null)
+            clonedPolicy.car = (Car) this.car.clone();
+        if (this.expiryDate != null)
+            clonedPolicy.expiryDate = (MyDate) this.expiryDate.clone();
+        clonedPolicy.id = idCounter++;
+        return clonedPolicy;
+    }
+
+    public static ArrayList<InsurancePolicy> shallowCopy(ArrayList<InsurancePolicy> policies) {
+        ArrayList<InsurancePolicy> shallowCopyList = new ArrayList<>();
+        for (InsurancePolicy policy : policies) {
+            shallowCopyList.add(policy);
+        }
+        return shallowCopyList;
+    }
+
+    public static ArrayList<InsurancePolicy> deepCopy(ArrayList<InsurancePolicy> policies)
+            throws CloneNotSupportedException {
+        ArrayList<InsurancePolicy> deepCopyList = new ArrayList<>();
+        for (InsurancePolicy policy : policies) {
+            deepCopyList.add(policy.clone());
+        }
+        return deepCopyList;
+    }
+
+    public int compareTo(InsurancePolicy other) {
+        return this.expiryDate.compareTo(other.expiryDate);
     }
 }

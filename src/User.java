@@ -1,6 +1,7 @@
 import java.util.ArrayList;
+import java.util.Collections;
 
-public class User {
+public class User implements Cloneable, Comparable<User> {
     private static int idCounter = 0;
     private String name;
     private int userID;
@@ -210,5 +211,84 @@ public class User {
             result += "    " + policy.toString().replace("\n", "\n    ") + "\n";
         }
         return result;
+    }
+
+    // lab-4
+    public User(User user) throws CloneNotSupportedException {
+        this.name = user.name;
+        this.userID = idCounter++;
+        this.address = user.address.clone();
+        this.policies = new ArrayList<>();
+        for (InsurancePolicy policy : user.policies) {
+            this.policies.add(policy.clone());
+        }
+    }
+
+    @Override
+    public User clone() throws CloneNotSupportedException {
+        return new User(this);
+        // User clonedUser = (User) super.clone();
+        // clonedUser.address = this.address.clone();
+        // clonedUser.policies = new ArrayList<>();
+        // for (InsurancePolicy policy : this.policies) {
+        // clonedUser.policies.add(policy.clone());
+        // }
+        // clonedUser.userID = this.idCounter++;
+        // return clonedUser;
+    }
+
+    public static ArrayList<User> shallowCopy(ArrayList<User> users) {
+        ArrayList<User> shallowCopyList = new ArrayList<>();
+        for (User user : users) {
+            shallowCopyList.add(user);
+        }
+        return shallowCopyList;
+    }
+
+    public static ArrayList<User> deepCopy(ArrayList<User> users) throws CloneNotSupportedException {
+        ArrayList<User> deepCopyList = new ArrayList<>();
+        for (User user : users) {
+            deepCopyList.add(user.clone());
+        }
+        return deepCopyList;
+    }
+
+    ArrayList<InsurancePolicy> deepCopyPolicies() throws CloneNotSupportedException {
+        ArrayList<InsurancePolicy> deepCopyList = new ArrayList<>();
+        for (InsurancePolicy policy : this.getPolicies()) {
+            deepCopyList.add(policy.clone());
+        }
+        return deepCopyList;
+    }
+
+    ArrayList<InsurancePolicy> shallowCopyPolicies() {
+        ArrayList<InsurancePolicy> shallowCopyList = new ArrayList<>();
+        for (InsurancePolicy policy : this.policies) {
+            shallowCopyList.add(policy);
+        }
+        return shallowCopyList;
+    }
+
+    public int compareTo1(User otherUser) {
+        return this.getAddress().compareTo(otherUser.getAddress());
+    }
+
+    public int compareTo(User otherUser) {
+        final int flatRate = 2;
+        double myTotal = this.calcTotalPremiums(flatRate);
+        double otherTotal = otherUser.calcTotalPremiums(flatRate);
+        return Double.compare(myTotal, otherTotal);
+
+        // other way
+        // if (myTotal == otherTotal) {
+        // return 0;
+        // }
+        // return myTotal > otherTotal ? 1 : -1;
+    }
+
+    public ArrayList<InsurancePolicy> sortPoliciesByDate() {
+        ArrayList<InsurancePolicy> sortedPolicies = new ArrayList<>(this.policies);
+        Collections.sort(sortedPolicies);
+        return sortedPolicies;
     }
 }

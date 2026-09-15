@@ -1,7 +1,7 @@
 import java.util.ArrayList;
 
 public class TestCode {
-        public static void runTests() {
+        public static void runTests() throws CloneNotSupportedException {
                 System.out.println("\n========================================");
                 System.out.println("   TEST SYSTEM (CORE + STANDARD + ADVANCE)  ");
                 System.out.println("========================================\n");
@@ -249,5 +249,71 @@ public class TestCode {
                 System.out.println("\n========================================");
                 System.out.println("   FINISH TESTING     ");
                 System.out.println("========================================\n");
+
+                // lab-4
+                System.out.println("----LAB-4 TESTING----");
+
+                System.out.println("---User Policies Copy---");
+                ArrayList<InsurancePolicy> user1DeepCopyPolicies = u1.deepCopyPolicies();
+                ArrayList<InsurancePolicy> user1ShallowCopyPolicies = u1.shallowCopyPolicies();
+
+                u1.setCity("New York");
+                u1.createThirdPartyPolicy("Foad 2", car, 12, "Good", new MyDate(2027, 6, 15));
+
+                ArrayList<InsurancePolicy> sortedPolicies = u1.sortPoliciesByDate();
+
+                System.out.println("---Original User Sorted Policies---");
+                InsurancePolicy.printPolicies(sortedPolicies);
+
+                System.out.println("---Shallow Copy Policies---");
+                InsurancePolicy.printPolicies(user1ShallowCopyPolicies);
+
+                System.out.println("---Deep Copy Policies---");
+                InsurancePolicy.printPolicies(user1DeepCopyPolicies);
+
+                System.out.println("---Company Users Copy---");
+                ArrayList<User> companyDeepCopyUsers = company.deepCopyUsers();
+                ArrayList<User> companyShallowCopyUsers = company.shallowCopyUsers();
+
+                User newUser = new User("Alireza", new Address(900, "Azadi", "test",
+                                "Abadan"));
+                company.addUser(newUser);
+
+                ArrayList<User> sortedUsers = company.sortUsers();
+                companyShallowCopyUsers.get(0).setName("Test Change shallow list");
+                System.out.println("---Original Company Users---");
+                for (User u : sortedUsers) {
+                        System.out.println("-ID: " + u.getUserID() + ", Name: " + u.getName() + " City: "
+                                        + u.getAddress().getCity());
+                }
+                System.out.println("---Shallow Copy Users---");
+                for (User u : companyShallowCopyUsers) {
+                        System.out.println("-ID: " + u.getUserID() + ", Name: " + u.getName() + " City: "
+                                        + u.getAddress().getCity());
+                }
+                System.out.println("---Deep Copy Users---");
+                for (User u : companyDeepCopyUsers) {
+                        System.out.println("-ID: " + u.getUserID() + ", Name: " + u.getName() + " City: "
+                                        + u.getAddress().getCity());
+                }
+                try {
+                        InsuranceCompany clonedCompany = company.clone();
+                        System.out.println("original Company Name: " + company.getName());
+                        System.out.println("cloned Company Name: " + clonedCompany.getName());
+
+                        clonedCompany.setName("Cloned Pars Insurance");
+                        System.out.println("after changing cloned company name to 'Cloned Pars Insurance':");
+                        System.out.println("original Company Name: " + company.getName()
+                                        + " (must be 'Pars Insurance')");
+                        System.out.println("cloned Company Name: " + clonedCompany.getName()
+                                        + " (must be 'Cloned Pars Insurance')");
+                        if (!company.getName().equals(clonedCompany.getName())) {
+                                System.out.println("Clone is a deep copy successfully.");
+                        } else {
+                                System.out.println("Clone share references with original object");
+                        }
+                } catch (CloneNotSupportedException e) {
+                        System.err.println("Error while cloning company: " + e.getMessage());
+                }
         }
 }

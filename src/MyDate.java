@@ -1,6 +1,6 @@
 import java.time.LocalDate;
 
-public class MyDate {
+public class MyDate implements Cloneable, Comparable<MyDate> {
     private int year;
     private int month;
     private int day;
@@ -68,7 +68,25 @@ public class MyDate {
                 expiryDate.getYear(),
                 expiryDate.getMonth(),
                 expiryDate.getDay());
-
         return !currentDate.isAfter(expiry);
+    }
+
+    // lab-4
+    public MyDate(MyDate date) {
+        this.year = date.year;
+        this.month = date.month;
+        this.day = date.day;
+    }
+
+    @Override
+    public MyDate clone() throws CloneNotSupportedException {
+        return (MyDate) super.clone();
+    }
+
+    @Override
+    public int compareTo(MyDate other) {
+        LocalDate thisDate = LocalDate.of(this.year, this.month, this.day);
+        LocalDate otherDate = LocalDate.of(other.year, other.month, other.day);
+        return thisDate.compareTo(otherDate);
     }
 }

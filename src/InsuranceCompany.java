@@ -1,6 +1,7 @@
 import java.util.ArrayList;
+import java.util.Collections;
 
-public class InsuranceCompany {
+public class InsuranceCompany implements Cloneable {
     String name;
     private ArrayList<User> users;
     private String adminUsername;
@@ -397,4 +398,59 @@ public class InsuranceCompany {
         return result;
     }
 
+    // lab-4
+    public InsuranceCompany(
+            InsuranceCompany company) throws IllegalArgumentException, CloneNotSupportedException {
+        if (company.name == null || company.name.trim().isEmpty()) {
+            throw new IllegalArgumentException(
+                    "Company name cannot be empty.");
+        }
+        if (company.adminUsername == null || company.adminUsername.trim().isEmpty()) {
+            throw new IllegalArgumentException(
+                    "Admin username cannot be empty.");
+        }
+        if (company.adminPassword == null || company.adminPassword.trim().isEmpty()) {
+            throw new IllegalArgumentException(
+                    "Admin password cannot be empty.");
+        }
+        if (company.flatRate < 0) {
+            throw new IllegalArgumentException(
+                    "Flat rate cannot be negative.");
+        }
+        this.name = company.name;
+        this.users = new ArrayList<>();
+        for (User user : company.getUsers()) {
+            users.add(user.clone());
+        }
+        this.adminUsername = company.adminUsername;
+        this.adminPassword = company.adminPassword;
+        this.flatRate = company.flatRate;
+    }
+
+    @Override
+    public InsuranceCompany clone() throws CloneNotSupportedException {
+        return (InsuranceCompany) super.clone();
+    }
+
+    ArrayList<User> deepCopyUsers() throws CloneNotSupportedException {
+        ArrayList<User> deepCopyList = new ArrayList<>();
+        for (User user : this.users) {
+            deepCopyList.add(user.clone());
+        }
+        return deepCopyList;
+    }
+
+    ArrayList<User> shallowCopyUsers() {
+        ArrayList<User> shallowCopyList = new ArrayList<>();
+        for (User user : this.users) {
+            shallowCopyList.add(user);
+        }
+        return shallowCopyList;
+    }
+
+    ArrayList<User> sortUsers() {
+        ArrayList<User> sortedUsers = new ArrayList<>(this.users);
+        Collections.sort(sortedUsers);
+        return sortedUsers;
+    }
 }

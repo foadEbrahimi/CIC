@@ -1,4 +1,4 @@
-public class Address {
+public class Address implements Cloneable, Comparable<Address> {
     private int streetNum;
     private String street;
     private String suburb;
@@ -72,4 +72,25 @@ public class Address {
     public String toString() {
         return this.streetNum + " " + this.street + ", " + this.suburb + ", " + this.city;
     }
+
+    // lab-4
+    public Address(Address address) throws IllegalArgumentException {
+        if (address.streetNum <= 0) {
+            throw new IllegalArgumentException("StreetNum can not be negative!");
+        }
+        this.streetNum = address.streetNum;
+        this.street = address.street;
+        this.suburb = address.suburb;
+        this.city = address.city;
+    }
+
+    @Override
+    public Address clone() throws CloneNotSupportedException {
+        return (Address) super.clone();
+    }
+
+    public int compareTo(Address otherCity) {
+        return this.city.compareTo(otherCity.getCity());
+    }
+
 }

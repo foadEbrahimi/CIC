@@ -24,4 +24,10 @@ public class ThirdPartyPolicy extends InsurancePolicy {
     public double calcPayment(double flatRate) {
         return this.car.getPrice() / 100 + this.getNumberOfClaims() * 200 + flatRate;
     }
+
+    // lab-4
+    public ThirdPartyPolicy(ThirdPartyPolicy policy) throws CloneNotSupportedException {
+        super(policy);
+        this.comments = policy.comments;
+    }
 }

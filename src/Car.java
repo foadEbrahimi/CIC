@@ -1,4 +1,4 @@
-public class Car {
+public class Car implements Cloneable {
     protected String model;
     protected CarType type;
     protected int manuFacturingYear;
@@ -70,5 +70,18 @@ public class Car {
         return "Model: " + this.model + "Type: " + this.type + "ManufacturingYear: " + this.manuFacturingYear
                 + "Price: "
                 + this.price;
+    }
+
+    // lab-4
+    public Car(Car car) {
+        this.model = car.model;
+        this.type = car.type;
+        this.manuFacturingYear = car.manuFacturingYear;
+        this.price = car.price;
+    }
+
+    @Override
+    public Car clone() throws CloneNotSupportedException {
+        return (Car) super.clone();
     }
 }
