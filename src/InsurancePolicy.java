@@ -7,6 +7,8 @@ public abstract class InsurancePolicy implements Cloneable, Comparable<Insurance
     protected Car car;
     protected int numberOfClaims;
     protected MyDate expiryDate;
+    public int driverAge;
+    public int level;
 
     public InsurancePolicy(String policyHolderName,
             Car car,
@@ -157,9 +159,9 @@ public abstract class InsurancePolicy implements Cloneable, Comparable<Insurance
     public InsurancePolicy(InsurancePolicy policy) throws CloneNotSupportedException {
         this.policyHolderName = policy.policyHolderName;
         this.id = idCounter++;
-        this.car = policy.car.clone();
+        this.car = (Car) policy.car.clone();
         this.numberOfClaims = policy.numberOfClaims;
-        this.expiryDate = policy.expiryDate.clone();
+        this.expiryDate = (MyDate) policy.expiryDate.clone();
     }
 
     @Override

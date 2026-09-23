@@ -420,16 +420,11 @@ public class InsuranceCompany implements Cloneable {
         this.name = company.name;
         this.users = new ArrayList<>();
         for (User user : company.getUsers()) {
-            users.add(user.clone());
+            users.add(new User(user));
         }
         this.adminUsername = company.adminUsername;
         this.adminPassword = company.adminPassword;
         this.flatRate = company.flatRate;
-    }
-
-    @Override
-    public InsuranceCompany clone() throws CloneNotSupportedException {
-        return (InsuranceCompany) super.clone();
     }
 
     ArrayList<User> deepCopyUsers() throws CloneNotSupportedException {
@@ -438,6 +433,13 @@ public class InsuranceCompany implements Cloneable {
             deepCopyList.add(user.clone());
         }
         return deepCopyList;
+    }
+
+    @Override
+    public InsuranceCompany clone() throws CloneNotSupportedException {
+        InsuranceCompany clonedCompany = (InsuranceCompany) super.clone();
+        clonedCompany.users = deepCopyUsers();
+        return clonedCompany;
     }
 
     ArrayList<User> shallowCopyUsers() {

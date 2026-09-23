@@ -220,7 +220,12 @@ public class User implements Cloneable, Comparable<User> {
         this.address = user.address.clone();
         this.policies = new ArrayList<>();
         for (InsurancePolicy policy : user.policies) {
-            this.policies.add(policy.clone());
+            // this.policies.add(policy.clone());
+            if (policy instanceof ThirdPartyPolicy)
+                this.policies.add(new ThirdPartyPolicy((ThirdPartyPolicy) policy));
+            else {
+                this.policies.add(new ComprehensivePolicy((ComprehensivePolicy) policy));
+            }
         }
     }
 
@@ -256,7 +261,12 @@ public class User implements Cloneable, Comparable<User> {
     ArrayList<InsurancePolicy> deepCopyPolicies() throws CloneNotSupportedException {
         ArrayList<InsurancePolicy> deepCopyList = new ArrayList<>();
         for (InsurancePolicy policy : this.getPolicies()) {
-            deepCopyList.add(policy.clone());
+            // deepCopyList.add(policy.clone());
+            if (policy instanceof ThirdPartyPolicy)
+                deepCopyList.add(new ThirdPartyPolicy((ThirdPartyPolicy) policy));
+            else {
+                deepCopyList.add(new ComprehensivePolicy((ComprehensivePolicy) policy));
+            }
         }
         return deepCopyList;
     }
