@@ -36,6 +36,7 @@ public class UiMethods {
 
     public static void addUserThirdPartyPolicy(User user, Scanner inputReader) {
         try {
+            int id = Helper.readInt(inputReader, "Enter ID: ");
             String holder = Helper.readNonEmptyString(inputReader, "Policy Holder Name: ");
             String model = Helper.readNonEmptyString(inputReader, "Car Model: ");
             CarType type = CarType.SED;
@@ -47,7 +48,7 @@ public class UiMethods {
             String comments = Helper.readNonEmptyString(inputReader, "Comments: ");
             MyDate expiry = readMyDateFromInput(inputReader);
 
-            if (user.createThirdPartyPolicy(holder, car, claims, comments, expiry)) {
+            if (user.createThirdPartyPolicy(holder, id, car, claims, comments, expiry)) {
                 System.out.println("Policy added successfully.");
             } else {
                 System.out.println("Error: Policy ID already exists.");
@@ -59,6 +60,7 @@ public class UiMethods {
 
     public static void addUserComprehensivePolicy(User user, Scanner inputReader) {
         try {
+            int id = Helper.readInt(inputReader, "Enter ID: ");
             String holder = Helper.readNonEmptyString(inputReader, "Policy Holder Name: ");
             String model = Helper.readNonEmptyString(inputReader, "Car Model: ");
             CarType type = CarType.SED;
@@ -71,7 +73,7 @@ public class UiMethods {
             int level = Helper.readValidInt(inputReader, "Coverage Level: ", 1, 10);
             MyDate expiry = readMyDateFromInput(inputReader);
 
-            if (user.createComprehensivePolicy(holder, car, claims, driverAge, level, expiry)) {
+            if (user.createComprehensivePolicy(holder, id, car, claims, driverAge, level, expiry)) {
                 System.out.println("Policy added successfully.");
             } else {
                 System.out.println("Error: Policy ID already exists.");
@@ -95,13 +97,13 @@ public class UiMethods {
         }
     }
 
-    public static void initializeSampleData(InsuranceCompany company) {
+    public static void initializeSampleData(InsuranceCompany company) throws IllegalArgumentException, PolicyException {
         // User 1 - Tehran
         Address addr1 = new Address(12, "Valiasr", "District 6", "Tehran");
         User u1 = new User("Foad Ebrahimi", addr1);
         company.addUser(u1);
         Car car1 = new Car("Mercedes-Benz CLS 350", CarType.LUX, 2022, 120000);
-        ThirdPartyPolicy p1 = new ThirdPartyPolicy("Foad Ebrahimi", car1, 1, "Premium third-party policy",
+        ThirdPartyPolicy p1 = new ThirdPartyPolicy("Foad Ebrahimi", 311111, car1, 1, "Premium third-party policy",
                 new MyDate(2026, 12, 30));
         company.addPolicy(u1.getUserID(), p1);
 
@@ -111,7 +113,8 @@ public class UiMethods {
         company.addUser(u2);
 
         Car car2 = new Car("BMW X5", CarType.SUV, 2021, 200000);
-        ComprehensivePolicy p2 = new ComprehensivePolicy("Ali Rezaei", car2, 0, 28, 5, new MyDate(2026, 10, 10));
+        ComprehensivePolicy p2 = new ComprehensivePolicy("Ali Rezaei", 311112, car2, 0, 28, 5,
+                new MyDate(2026, 10, 10));
         company.addPolicy(u2.getUserID(), p2);
 
         // User 3 - Isfahan
@@ -120,7 +123,7 @@ public class UiMethods {
         company.addUser(u3);
 
         Car car3 = new Car("Toyota Corolla", CarType.SED, 2020, 50000);
-        ThirdPartyPolicy p3 = new ThirdPartyPolicy("Sara Mohammadi", car3, 2, "Standard coverage",
+        ThirdPartyPolicy p3 = new ThirdPartyPolicy("Sara Mohammadi", 311113, car3, 2, "Standard coverage",
                 new MyDate(2027, 3, 15));
         company.addPolicy(u3.getUserID(), p3);
 
@@ -130,7 +133,8 @@ public class UiMethods {
         company.addUser(u4);
 
         Car car4 = new Car("Peugeot 206", CarType.HATCH, 2019, 30000);
-        ComprehensivePolicy p4 = new ComprehensivePolicy("Reza Karimi", car4, 1, 22, 3, new MyDate(2026, 8, 20));
+        ComprehensivePolicy p4 = new ComprehensivePolicy("Reza Karimi", 311114, car4, 1, 22, 3,
+                new MyDate(2026, 8, 20));
         company.addPolicy(u4.getUserID(), p4);
     }
 
@@ -151,10 +155,11 @@ public class UiMethods {
         }
     }
 
-    public static void createThirdPartyPolicy(InsuranceCompany company, Scanner inputReader) {
+    public static void createThirdPartyPolicy(InsuranceCompany company, Scanner inputReader) throws PolicyException {
         int userId = Helper.readInt(inputReader, "Enter User ID: ");
         try {
             User user = company.findUser(userId);
+            int id = Helper.readInt(inputReader, "Enter ID: ");
             String holder = Helper.readNonEmptyString(inputReader, "Policy Holder Name: ");
             String model = Helper.readNonEmptyString(inputReader, "Car Model: ");
             CarType type = CarType.SED;
@@ -165,20 +170,31 @@ public class UiMethods {
             String comments = Helper.readNonEmptyString(inputReader, "Comments: ");
             MyDate expiry = readMyDateFromInput(inputReader);
 
-            if (user.createThirdPartyPolicy(holder, car, claims, comments, expiry)) {
-                System.out.println("ThirdParty Policy created successfully.");
-            } else {
-                System.out.println("Error: Policy is already exists for this user.");
+            try {
+                if (user.createThirdPartyPolicy(holder, id, car, claims, comments, expiry)) {
+                    System.out.println("ThirdParty Policy created successfully.");
+                } else {
+                    System.out.println("Error: Policy already exists for this user.");
+                }
+            } catch (PolicyException e) {
+                int newID = e.getID();
+                if (user.createThirdPartyPolicy(holder, newID, car, claims, comments, expiry)) {
+                    System.out.println("Policy created with generated ID: " + newID);
+                    System.err.println(e.toString());
+                } else {
+                    System.out.println("Error: Could not create policy with generated ID.");
+                }
             }
         } catch (IllegalArgumentException e) {
             System.out.println("Error: " + e.getMessage());
         }
     }
 
-    public static void createComprehensivePolicy(InsuranceCompany company, Scanner inputReader) {
+    public static void createComprehensivePolicy(InsuranceCompany company, Scanner inputReader) throws PolicyException {
         int userId = Helper.readInt(inputReader, "Enter User ID: ");
         try {
             User user = company.findUser(userId);
+            int id = Helper.readInt(inputReader, "Enter ID: ");
             String holder = Helper.readNonEmptyString(inputReader, "Policy Holder Name: ");
             String model = Helper.readNonEmptyString(inputReader, "Car Model: ");
             CarType type = CarType.SED;
@@ -190,10 +206,20 @@ public class UiMethods {
             int level = Helper.readValidInt(inputReader, "Coverage Level: ", 1, 10);
             MyDate expiry = readMyDateFromInput(inputReader);
 
-            if (user.createComprehensivePolicy(holder, car, claims, driverAge, level, expiry)) {
-                System.out.println("Comprehensive Policy created successfully.");
-            } else {
-                System.out.println("Error: Policy is already exists for this user.");
+            try {
+                if (user.createComprehensivePolicy(holder, id, car, claims, driverAge, level, expiry)) {
+                    System.out.println("Comprehensive Policy created successfully.");
+                } else {
+                    System.out.println("Error: Policy already exists for this user.");
+                }
+            } catch (PolicyException e) {
+                int newID = e.getID();
+                if (user.createComprehensivePolicy(holder, newID, car, claims, driverAge, level, expiry)) {
+                    System.err.println(e.toString());
+                    System.out.println("Policy created with generated ID: " + newID);
+                } else {
+                    System.out.println("Error: Could not create policy with generated ID.");
+                }
             }
         } catch (IllegalArgumentException e) {
             System.out.println("Error: " + e.getMessage());
@@ -205,7 +231,7 @@ public class UiMethods {
         try {
             User user = company.findUser(userId);
             user.print();
-        } catch (IllegalArgumentException e) {
+        } catch (NullPointerException e) {
             System.out.println("Error: " + e.getMessage());
         }
     }

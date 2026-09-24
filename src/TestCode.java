@@ -1,7 +1,8 @@
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class TestCode {
-        public static void runTests() throws CloneNotSupportedException {
+        public static void runTests() throws CloneNotSupportedException, IllegalArgumentException, PolicyException {
                 System.out.println("\n========================================");
                 System.out.println("   TEST SYSTEM (CORE + STANDARD + ADVANCE)  ");
                 System.out.println("========================================\n");
@@ -105,7 +106,8 @@ public class TestCode {
                 }
 
                 System.out.println("\n--- [THIRDPARTY POLICY] ---");
-                ThirdPartyPolicy tp = new ThirdPartyPolicy("Foad Ebrahimi", car, 1, "Premium", new MyDate(2026, 1, 20));
+                ThirdPartyPolicy tp = new ThirdPartyPolicy("Foad Ebrahimi", 300001, car, 1, "Premium",
+                                new MyDate(2026, 1, 20));
                 System.out.println("TC-18 - calcPayment(flat=100): " + tp.calcPayment(100));
                 System.out.println("TC-19 - setNumberOfClaims(2): " + tp.setNumberOfClaims(2));
                 System.out.println("TC-19 - setNumberOfClaims(-1): " + tp.setNumberOfClaims(-1));
@@ -120,7 +122,7 @@ public class TestCode {
                 System.out.println("TC-19 - carPriceRise(0.01) done.");
 
                 System.out.println("\n--- [COMPREHENSIVE POLICY] ---");
-                ComprehensivePolicy cp = new ComprehensivePolicy("Ali Hosseini", car, 0, 25, 5,
+                ComprehensivePolicy cp = new ComprehensivePolicy("Ali Hosseini", 300002, car, 0, 25, 5,
                                 new MyDate(2026, 10, 10));
                 System.out.println("TC-20 - calcPayment(age=25, flat=100): " + cp.calcPayment(100));
                 System.out.println("TC-21 - getDriverAge(): " + cp.getDriverAge());
@@ -133,9 +135,9 @@ public class TestCode {
                 System.out.println("TC-23 - findPolicy(tp.getId())!=null: " + (u1.findPolicy(tp.getId()) != null));
                 System.out.println("TC-23 - findPolicy(999)==null: " + (u1.findPolicy(999) == null));
                 System.out.println("TC-24 - createThirdPartyPolicy: "
-                                + u1.createThirdPartyPolicy("Foad", car, 0, "Std", new MyDate(2027, 1, 1)));
+                                + u1.createThirdPartyPolicy("Foad", 300003, car, 0, "Std", new MyDate(2027, 1, 1)));
                 System.out.println("TC-25 - createComprehensivePolicy: "
-                                + u1.createComprehensivePolicy("Foad", car, 0, 35, 3, new MyDate(2027, 6, 1)));
+                                + u1.createComprehensivePolicy("Foad", 300004, car, 0, 35, 3, new MyDate(2027, 6, 1)));
                 System.out.println("TC-26 - calcTotalPremiums: " + u1.calcTotalPremiums(100));
                 System.out.println("TC-27 - filterByCarModel('Honda').size(): " + u1.filterByCarModel("Honda").size());
                 System.out.println("TC-27 - filterByExpiryDate(2027/1/1).size(): "
@@ -236,7 +238,8 @@ public class TestCode {
                                 + company.changeAdminPassword(oldPass, newPass));
                 System.out.println("TC-58 - Validate New Password: " + company.validateAdmin("admin", newPass));
                 company.changeAdminPassword(newPass, oldPass);
-                ThirdPartyPolicy tpTemp = new ThirdPartyPolicy("Temp", new Car("TempCar", CarType.SED, 2020, 10000), 0,
+                ThirdPartyPolicy tpTemp = new ThirdPartyPolicy("Temp", 300005,
+                                new Car("TempCar", CarType.SED, 2020, 10000), 0,
                                 "Temp", new MyDate(2027, 1, 1));
                 u1.addPolicy(tpTemp);
                 System.out.println("TC-59 - Remove Policy via Company (999): "
@@ -258,7 +261,7 @@ public class TestCode {
                 ArrayList<InsurancePolicy> user1ShallowCopyPolicies = u1.shallowCopyPolicies();
 
                 u1.setCity("New York");
-                u1.createThirdPartyPolicy("Foad 2", car, 12, "Good", new MyDate(2027, 6, 15));
+                u1.createThirdPartyPolicy("Foad 2", 300006, car, 12, "Good", new MyDate(2027, 6, 15));
 
                 ArrayList<InsurancePolicy> sortedPolicies = u1.sortPoliciesByDate();
 
@@ -309,5 +312,59 @@ public class TestCode {
                 } catch (CloneNotSupportedException e) {
                         System.err.println("Error while cloning company => " + e.getMessage());
                 }
+
+                // lab-5
+                System.out.println("----LAB-5 TESTING----");
+                System.out.println("---user 1 report By Car Model---");
+                u1.reportCarModels();
+
+                if (!company.getUsers().isEmpty()) {
+                        User userForReport = company.getUsers().values().iterator().next();
+                        System.out.println("---User Report: Car Models---");
+                        userForReport.reportCarModels();
+                }
+
+                System.out.println("---Company Report: Cities---");
+                company.reportCity();
+
+                System.out.println("---Company Report: Car Models---");
+                company.reportCarModels();
+
+                System.out.println("---Premium Per City Report");
+                HashMap<String, Double> premiumPerCity = company.getTotalPremiumPerCity();
+                for (String city : premiumPerCity.keySet()) {
+                        System.out.println("City: " + city + " -> $" + premiumPerCity.get(city));
+                }
+
+                System.out.println("---Count Per Car Model Report");
+                HashMap<String, Integer> countPerModel = company.getTotalCountPerCarModel();
+                for (String model : countPerModel.keySet()) {
+                        System.out.println("Model: " + model + " -> Count: " + countPerModel.get(model));
+                }
+
+                System.out.println("---Premium Per Car Model Report---");
+                HashMap<String, Double> premiumPerModel = company.getTotalPremiumPerCarModel();
+                for (String model : premiumPerModel.keySet()) {
+                        System.out.printf("Model: %-25s -> Premium: $%,.2f%n", model, premiumPerModel.get(model));
+                }
+
+                try {
+                        company.createComprehensivePolicy(u1.getUserID(), "test", 12,
+                                        new Car("foad car", CarType.LUX, 2000, 120000), 122, 19,
+                                        15, date2);
+                } catch (PolicyException e) {
+                        int newID = e.getID();
+                        if (company.createComprehensivePolicy(u1.getUserID(), "test", newID,
+                                        new Car("foad car", CarType.LUX, 2000, 120000), 122, 19,
+                                        15, date2)) {
+                                System.out.println("Policy created with generated ID: " + newID);
+                                System.err.println(e.toString());
+                        } else {
+                                System.out.println("Error: Could not create policy with generated ID.");
+                        }
+                }
+                company.printPolicies(u1.getUserID());
+                u1.print();
         }
+
 }

@@ -3,7 +3,8 @@ import java.util.Scanner;
 
 public class Ui {
 
-    public static void coreTest(Scanner inputReader) throws CloneNotSupportedException {
+    public static void coreTest(Scanner inputReader)
+            throws CloneNotSupportedException, IllegalArgumentException, PolicyException {
         InsuranceCompany company = new InsuranceCompany("Pars Insurance", "admin", "1234", 100);
         UiMethods.initializeSampleData(company);
         boolean loggedIn = false;
@@ -80,7 +81,7 @@ public class Ui {
         }
     }
 
-    public static void standardTest(Scanner inputReader) throws CloneNotSupportedException {
+    public static void standardTest(Scanner inputReader) throws CloneNotSupportedException, PolicyException {
         InsuranceCompany company = new InsuranceCompany("Pars Insurance", "admin", "1234", 100);
         UiMethods.initializeSampleData(company);
 
@@ -111,7 +112,7 @@ public class Ui {
         }
     }
 
-    public static void advanceTest(Scanner inputReader) throws CloneNotSupportedException {
+    public static void advanceTest(Scanner inputReader) throws CloneNotSupportedException, PolicyException {
         InsuranceCompany company = new InsuranceCompany("Pars Insurance", "admin", "1234", 100);
         UiMethods.initializeSampleData(company);
         boolean mainMenuRunning = true;
@@ -141,7 +142,8 @@ public class Ui {
         }
     }
 
-    private static void handleAdminLogin(InsuranceCompany company, Scanner inputReader, boolean isAdvanced) throws CloneNotSupportedException {
+    private static void handleAdminLogin(InsuranceCompany company, Scanner inputReader, boolean isAdvanced)
+            throws CloneNotSupportedException, PolicyException {
         Helper.clearConsole();
         System.out.println("\n--- ADMIN LOGIN ---");
         String user = Helper.readNonEmptyString(inputReader, "Username: ");
@@ -180,7 +182,8 @@ public class Ui {
         }
     }
 
-    private static void standardAdminMenu(InsuranceCompany company, Scanner inputReader) throws CloneNotSupportedException {
+    private static void standardAdminMenu(InsuranceCompany company, Scanner inputReader)
+            throws CloneNotSupportedException, PolicyException {
         boolean adminRunning = true;
         while (adminRunning) {
             Helper.clearConsole();
@@ -258,7 +261,8 @@ public class Ui {
         }
     }
 
-    private static void advancedAdminMenu(InsuranceCompany company, Scanner inputReader) throws CloneNotSupportedException {
+    private static void advancedAdminMenu(InsuranceCompany company, Scanner inputReader)
+            throws CloneNotSupportedException, IllegalArgumentException, PolicyException {
         boolean adminRunning = true;
         while (adminRunning) {
             Helper.clearConsole();
@@ -279,10 +283,13 @@ public class Ui {
             System.out.println("13. Remove Policy from User");
             System.out.println("14. Change Admin Password");
             System.out.println("15. Report: Premium Per Car Model");
-            System.out.println("16. Log Out");
+            System.out.println("16. Report: Car Models for a Given User");
+            System.out.println("17. Report: City Premiums (All Users)");
+            System.out.println("18. Report: Car Models (All Users)");
+            System.out.println("19. Log Out");
             System.out.print("Select an option: ");
 
-            int choice = Helper.readValidInt(inputReader, "", 1, 16);
+            int choice = Helper.readValidInt(inputReader, "", 1, 19);
             switch (choice) {
                 case 1:
                     Helper.clearConsole();
@@ -294,7 +301,11 @@ public class Ui {
                     break;
                 case 3:
                     Helper.clearConsole();
-                    UiMethods.createThirdPartyPolicy(company, inputReader);
+                    try {
+                        UiMethods.createThirdPartyPolicy(company, inputReader);
+                    } catch (PolicyException e) {
+                        System.err.println(e.getMessage());
+                    }
                     break;
                 case 4:
                     Helper.clearConsole();
@@ -352,6 +363,23 @@ public class Ui {
                     }
                     break;
                 case 16:
+                    Helper.clearConsole();
+                    User userReport = company.findUser(Helper.readInt(inputReader, "Enter a userID for Report: "));
+                    if (userReport != null)
+                        userReport.reportCarModels();
+                    else {
+                        System.out.println("The user was not found for generating report");
+                    }
+                    break;
+                case 17:
+                    Helper.clearConsole();
+                    company.reportCity();
+                    break;
+                case 18:
+                    Helper.clearConsole();
+                    company.reportCarModels();
+                    break;
+                case 19:
                     System.out.println("Logging out...");
                     adminRunning = false;
                     break;

@@ -1,7 +1,7 @@
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public abstract class InsurancePolicy implements Cloneable, Comparable<InsurancePolicy> {
-    private static int idCounter = 100;
     protected int id;
     protected String policyHolderName;
     protected Car car;
@@ -10,14 +10,24 @@ public abstract class InsurancePolicy implements Cloneable, Comparable<Insurance
     public int driverAge;
     public int level;
 
-    public InsurancePolicy(String policyHolderName,
+    public InsurancePolicy(String policyHolderName, int id,
             Car car,
-            int numberOfClaims, MyDate expiryDate) {
+            int numberOfClaims, MyDate expiryDate) throws PolicyException {
         this.policyHolderName = policyHolderName;
-        this.id = idCounter++;
+        this.id = id;
+        if (!isValidID(id)) {
+            int newID = Helper.generateRandomID(399999, 300000);
+            this.id = newID;
+            throw new PolicyException(newID);
+        }
         this.car = car;
         this.numberOfClaims = numberOfClaims;
         this.expiryDate = expiryDate;
+    }
+
+    private boolean isValidID(int id) {
+        String idString = String.valueOf(id);
+        return idString.length() == 6 && idString.charAt(0) == '3';
     }
 
     public void print() {
@@ -158,7 +168,7 @@ public abstract class InsurancePolicy implements Cloneable, Comparable<Insurance
     // lab-4
     public InsurancePolicy(InsurancePolicy policy) throws CloneNotSupportedException {
         this.policyHolderName = policy.policyHolderName;
-        this.id = idCounter++;
+        this.id = policy.id;
         this.car = (Car) policy.car.clone();
         this.numberOfClaims = policy.numberOfClaims;
         this.expiryDate = (MyDate) policy.expiryDate.clone();
@@ -171,7 +181,7 @@ public abstract class InsurancePolicy implements Cloneable, Comparable<Insurance
             clonedPolicy.car = (Car) this.car.clone();
         if (this.expiryDate != null)
             clonedPolicy.expiryDate = (MyDate) this.expiryDate.clone();
-        clonedPolicy.id = idCounter++;
+        clonedPolicy.id = this.id;
         return clonedPolicy;
     }
 
@@ -195,4 +205,88 @@ public abstract class InsurancePolicy implements Cloneable, Comparable<Insurance
     public int compareTo(InsurancePolicy other) {
         return this.expiryDate.compareTo(other.expiryDate);
     }
+
+    // lab-5
+    static void printPolicies(HashMap<Integer, InsurancePolicy> policies) {
+        for (InsurancePolicy policy : policies.values()) {
+            policy.print();
+        }
+    }
+
+    static double calcTotalPayments(HashMap<Integer, InsurancePolicy> policies, int flatRate) {
+        double total = 0;
+        for (InsurancePolicy policy : policies.values()) {
+            total += policy.calcPayment(flatRate);
+        }
+        return total;
+    }
+
+    static void carPriceRiseAll(HashMap<Integer, InsurancePolicy> policies, double risePercent) {
+        for (InsurancePolicy policy : policies.values()) {
+            policy.carPriceRise(risePercent);
+        }
+    }
+
+    static ArrayList<InsurancePolicy> filterByCarModel(HashMap<Integer, InsurancePolicy> policies, String carModel) {
+        ArrayList<InsurancePolicy> filteredList = new ArrayList<>();
+        for (InsurancePolicy policy : policies.values()) {
+            if (policy.getCar().getModel().toLowerCase().contains(carModel.toLowerCase())) {
+                filteredList.add(policy);
+            }
+        }
+        return filteredList;
+    }
+
+    static boolean existsPolicy(HashMap<Integer, InsurancePolicy> policies, int id) {
+        for (InsurancePolicy policy : policies.values()) {
+            if (policy.getId() == id) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    static ArrayList<InsurancePolicy> filterByExpiryDate(HashMap<Integer, InsurancePolicy> policies, MyDate date) {
+        ArrayList<InsurancePolicy> filteredList = new ArrayList<>();
+        for (InsurancePolicy policy : policies.values()) {
+            if (policy.getExpiryDate().isExpired(date)) {
+                filteredList.add(policy);
+            }
+        }
+        return filteredList;
+    }
+
+    ArrayList<InsurancePolicy> shallowCopy(HashMap<Integer, InsurancePolicy> policies) {
+        ArrayList<InsurancePolicy> shallowCopyList = new ArrayList<>();
+        for (InsurancePolicy policy : policies.values()) {
+            shallowCopyList.add(policy);
+        }
+        return shallowCopyList;
+    }
+
+    ArrayList<InsurancePolicy> deepCopy(HashMap<Integer, InsurancePolicy> policies) throws CloneNotSupportedException {
+        ArrayList<InsurancePolicy> deepCopyList = new ArrayList<>();
+        for (InsurancePolicy policy : policies.values()) {
+            deepCopyList.add(policy.clone());
+        }
+        return deepCopyList;
+    }
+
+    HashMap<Integer, InsurancePolicy> shallowCopyHashMap(HashMap<Integer, InsurancePolicy> policies) {
+        HashMap<Integer, InsurancePolicy> shallowCopyListHashMap = new HashMap<Integer, InsurancePolicy>();
+        for (InsurancePolicy policy : policies.values()) {
+            shallowCopyListHashMap.put(policy.getId(), policy);
+        }
+        return shallowCopyListHashMap;
+    }
+
+    HashMap<Integer, InsurancePolicy> deepCopyHashMap(HashMap<Integer, InsurancePolicy> policies)
+            throws CloneNotSupportedException {
+        HashMap<Integer, InsurancePolicy> shallowCopyListHashMap = new HashMap<Integer, InsurancePolicy>();
+        for (InsurancePolicy policy : policies.values()) {
+            shallowCopyListHashMap.put(policy.getId(), policy.clone());
+        }
+        return shallowCopyListHashMap;
+    }
+
 }

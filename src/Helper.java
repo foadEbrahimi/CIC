@@ -60,4 +60,8 @@ public class Helper {
         System.out.println("\nPlease press any key to continue...");
         inputReader.nextLine();
     }
+
+    public static int generateRandomID(int max, int min) {
+        return (int) ((Math.random() * (max - min + 1)) + min);
+    }
 }

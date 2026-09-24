@@ -1,9 +1,11 @@
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 
 public class InsuranceCompany implements Cloneable {
     String name;
-    private ArrayList<User> users;
+    // private ArrayList<User> users;
+    private HashMap<Integer, User> users = new HashMap<Integer, User>();
     private String adminUsername;
     private String adminPassword;
     private int flatRate;
@@ -30,7 +32,8 @@ public class InsuranceCompany implements Cloneable {
                     "Flat rate cannot be negative.");
         }
         this.name = name;
-        this.users = new ArrayList<>();
+        // this.users = new ArrayList<>();
+        this.users = new HashMap<>();
         this.adminUsername = adminUsername;
         this.adminPassword = adminPassword;
         this.flatRate = flatRate;
@@ -41,9 +44,9 @@ public class InsuranceCompany implements Cloneable {
         return this.name;
     }
 
-    public ArrayList<User> getUsers() {
-        return this.users;
-    }
+    // public ArrayList<User> getUsers() {
+    // return this.users;
+    // }
 
     public String getAdminUsername() {
         return this.adminUsername;
@@ -97,17 +100,17 @@ public class InsuranceCompany implements Cloneable {
         return false;
     }
 
-    boolean addUser(User user) {
-        if (user == null) {
-            throw new NullPointerException(
-                    "User cannot be null.");
-        }
-        if (existsUser(user.getUserID())) {
-            return false;
-        }
-        this.users.add(user);
-        return true;
-    }
+    // boolean addUser(User user) {
+    // if (user == null) {
+    // throw new NullPointerException(
+    // "User cannot be null.");
+    // }
+    // if (existsUser(user.getUserID())) {
+    // return false;
+    // }
+    // this.users.add(user);
+    // return true;
+    // }
 
     boolean addUser(String name, Address address) {
         // way one
@@ -127,15 +130,15 @@ public class InsuranceCompany implements Cloneable {
         return addUser(new User(name, address));
     }
 
-    User findUser(int userID) {
-        for (User user : this.users) {
-            if (user.getUserID() == userID) {
-                return user;
-            }
-        }
-        throw new IllegalArgumentException(
-                "User with ID " + userID + " not found.");
-    }
+    // User findUser(int userID) {
+    // for (User user : this.users) {
+    // if (user.getUserID() == userID) {
+    // return user;
+    // }
+    // }
+    // throw new IllegalArgumentException(
+    // "User with ID " + userID + " not found.");
+    // }
 
     boolean addPolicy(int userID, InsurancePolicy policy) {
         User user = findUser(userID);
@@ -153,40 +156,40 @@ public class InsuranceCompany implements Cloneable {
         user.print();
     }
 
-    boolean createThirdPartyPolicy(int userID, String policyHolderName, Car car, int numberOfClaims,
-            String comments, MyDate expiryDate) {
+    boolean createThirdPartyPolicy(int userID, String policyHolderName, int id, Car car, int numberOfClaims,
+            String comments, MyDate expiryDate) throws PolicyException {
         User user = findUser(userID);
-        return user.createThirdPartyPolicy(policyHolderName, car, numberOfClaims, comments, expiryDate);
+        return user.createThirdPartyPolicy(policyHolderName, id, car, numberOfClaims, comments, expiryDate);
     }
 
-    boolean createComprehensivePolicy(int userID, String policyHolderName, Car car, int numberOfClaims,
-            int driverAge, int level, MyDate expiryDate) {
+    boolean createComprehensivePolicy(int userID, String policyHolderName, int id, Car car, int numberOfClaims,
+            int driverAge, int level, MyDate expiryDate) throws IllegalArgumentException, PolicyException {
         User user = findUser(userID);
-        return user.createComprehensivePolicy(policyHolderName, car, numberOfClaims, driverAge,
+        return user.createComprehensivePolicy(policyHolderName, id, car, numberOfClaims, driverAge,
                 level, expiryDate);
     }
 
-    public boolean existsUser(int userID) {
-        for (User user : this.users) {
-            if (user.getUserID() == userID) {
-                return true;
-            }
-        }
-        return false;
-    }
+    // public boolean existsUser(int userID) {
+    // for (User user : this.users) {
+    // if (user.getUserID() == userID) {
+    // return true;
+    // }
+    // }
+    // return false;
+    // }
 
     double calcTotalPayments(int userID) {
         User user = findUser(userID);
         return user.calcTotalPremiums(this.flatRate);
     }
 
-    double calcTotalPayments() {
-        double total = 0;
-        for (User user : this.users) {
-            total += user.calcTotalPremiums(this.flatRate);
-        }
-        return total;
-    }
+    // double calcTotalPayments() {
+    // double total = 0;
+    // for (User user : this.users) {
+    // total += user.calcTotalPremiums(this.flatRate);
+    // }
+    // return total;
+    // }
 
     boolean carPriceRise(int userID, double risePercent) {
         User user = findUser(userID);
@@ -194,79 +197,79 @@ public class InsuranceCompany implements Cloneable {
         return true;
     }
 
-    void carPriceRise(double risePercent) {
-        for (User user : this.users) {
-            user.carPriceRiseAll(risePercent);
-        }
-    }
+    // void carPriceRise(double risePercent) {
+    // for (User user : this.users) {
+    // user.carPriceRiseAll(risePercent);
+    // }
+    // }
 
-    ArrayList<InsurancePolicy> allPolicies() {
-        ArrayList<InsurancePolicy> allCompanyPolicies = new ArrayList<>();
-        for (User user : this.users) {
-            for (InsurancePolicy policy : user.getPolicies()) {
-                allCompanyPolicies.add(policy);
-            }
-        }
-        return allCompanyPolicies;
-    }
+    // ArrayList<InsurancePolicy> allPolicies() {
+    // ArrayList<InsurancePolicy> allCompanyPolicies = new ArrayList<>();
+    // for (User user : this.users) {
+    // for (InsurancePolicy policy : user.getPolicies()) {
+    // allCompanyPolicies.add(policy);
+    // }
+    // }
+    // return allCompanyPolicies;
+    // }
 
     ArrayList<InsurancePolicy> filterByCarModel(int userID, String carModel) {
         User user = findUser(userID);
         return user.filterByCarModel(carModel);
     }
 
-    ArrayList<InsurancePolicy> filterByExpiryDate(int userID, MyDate date) {
-        User user = findUser(userID);
-        ArrayList<InsurancePolicy> filteredPolicies = new ArrayList<>();
+    // ArrayList<InsurancePolicy> filterByExpiryDate(int userID, MyDate date) {
+    // User user = findUser(userID);
+    // ArrayList<InsurancePolicy> filteredPolicies = new ArrayList<>();
 
-        for (InsurancePolicy policy : user.getPolicies()) {
-            if (policy.getExpiryDate().isExpired(date)) {
-                filteredPolicies.add(policy);
-            }
-        }
-        return filteredPolicies;
-    }
+    // for (InsurancePolicy policy : user.getPolicies()) {
+    // if (policy.getExpiryDate().isExpired(date)) {
+    // filteredPolicies.add(policy);
+    // }
+    // }
+    // return filteredPolicies;
+    // }
 
-    ArrayList<InsurancePolicy> filterByCarModel(String carModel) {
-        ArrayList<InsurancePolicy> filteredList = new ArrayList<>();
+    // ArrayList<InsurancePolicy> filterByCarModel(String carModel) {
+    // ArrayList<InsurancePolicy> filteredList = new ArrayList<>();
 
-        for (User user : this.users) {
-            filteredList.addAll(user.filterByCarModel(carModel));
-        }
+    // for (User user : this.users) {
+    // filteredList.addAll(user.filterByCarModel(carModel));
+    // }
 
-        return filteredList;
-    }
+    // return filteredList;
+    // }
 
-    ArrayList<InsurancePolicy> filterByExpiryDate(MyDate date) {
-        ArrayList<InsurancePolicy> filteredList = new ArrayList<>();
+    // ArrayList<InsurancePolicy> filterByExpiryDate(MyDate date) {
+    // ArrayList<InsurancePolicy> filteredList = new ArrayList<>();
 
-        for (User user : this.users) {
-            filteredList.addAll(user.filterByExpiryDate(date));
-        }
+    // for (User user : this.users) {
+    // filteredList.addAll(user.filterByExpiryDate(date));
+    // }
 
-        return filteredList;
-    }
+    // return filteredList;
+    // }
 
-    ArrayList<String> populateDistinctCityNames() {
-        ArrayList<String> cities = new ArrayList<>();
-        for (User user : this.users) {
-            if (!cities.contains(user.getAddress().getCity().toLowerCase())) {
-                cities.add(user.getAddress().getCity().toLowerCase());
-            } else
-                continue;
-        }
-        return cities;
-    }
+    // ArrayList<String> populateDistinctCityNames() {
+    // ArrayList<String> cities = new ArrayList<>();
+    // for (User user : this.users) {
+    // if (!cities.contains(user.getAddress().getCity().toLowerCase())) {
+    // cities.add(user.getAddress().getCity().toLowerCase());
+    // } else
+    // continue;
+    // }
+    // return cities;
+    // }
 
-    double getTotalPaymentForCity(String city) {
-        double total = 0;
-        for (User user : this.users) {
-            if (user.getAddress().getCity().toLowerCase().equalsIgnoreCase(city)) {
-                total += user.calcTotalPremiums(this.flatRate);
-            }
-        }
-        return total;
-    }
+    // double getTotalPaymentForCity(String city) {
+    // double total = 0;
+    // for (User user : this.users) {
+    // if (user.getAddress().getCity().toLowerCase().equalsIgnoreCase(city)) {
+    // total += user.calcTotalPremiums(this.flatRate);
+    // }
+    // }
+    // return total;
+    // }
 
     ArrayList<Double> getTotalPaymentPerCity(ArrayList<String> cities) {
         ArrayList<Double> citiesTotalPayment = new ArrayList<>();
@@ -294,15 +297,15 @@ public class InsuranceCompany implements Cloneable {
         }
     }
 
-    public boolean removeUser(int userID) {
-        for (User user : this.users) {
-            if (user.getUserID() == userID) {
-                this.users.remove(user);
-                return true;
-            }
-        }
-        return false;
-    }
+    // public boolean removeUser(int userID) {
+    // for (User user : this.users) {
+    // if (user.getUserID() == userID) {
+    // this.users.remove(user);
+    // return true;
+    // }
+    // }
+    // return false;
+    // }
 
     public boolean changeAdminPassword(String oldPass, String newPass) {
         if (this.adminPassword.equals(oldPass)) {
@@ -314,9 +317,264 @@ public class InsuranceCompany implements Cloneable {
         return false;
     }
 
+    // ArrayList<String> populateDistinctCarModels() {
+    // ArrayList<String> allCarModels = new ArrayList<>();
+    // for (User user : this.users) {
+    // ArrayList<String> userModels = user.populateDistinctCarModels();
+    // for (String model : userModels) {
+    // boolean exists = false;
+    // for (String existingModel : allCarModels) {
+    // if (existingModel.equalsIgnoreCase(model)) {
+    // exists = true;
+    // break;
+    // }
+    // }
+    // if (!exists) {
+    // allCarModels.add(model);
+    // }
+    // }
+    // }
+    // return allCarModels;
+    // }
+
+    // ArrayList<Integer> getTotalCountPerCarModel(ArrayList<String> carModels) {
+    // ArrayList<Integer> totalCounts = new ArrayList<>();
+    // for (int i = 0; i < carModels.size(); i++) {
+    // totalCounts.add(0);
+    // }
+    // for (User user : this.users) {
+    // ArrayList<Integer> userCounts = user.getTotalCountPerCarModel(carModels);
+    // for (int i = 0; i < userCounts.size(); i++) {
+    // totalCounts.set(i, totalCounts.get(i) + userCounts.get(i));
+    // }
+    // }
+    // return totalCounts;
+    // }
+
+    // public ArrayList<Double> getTotalPaymentPerCarModel(ArrayList<String>
+    // carModels, int flatRate) {
+    // ArrayList<Double> totalPayments = new ArrayList<>();
+
+    // for (int i = 0; i < carModels.size(); i++) {
+    // totalPayments.add(0.0);
+    // }
+
+    // for (User user : this.users) {
+    // ArrayList<Double> userPayments = user.getTotalPaymentPerCarModel(carModels,
+    // flatRate);
+    // for (int i = 0; i < userPayments.size(); i++) {
+    // totalPayments.set(i, totalPayments.get(i) + userPayments.get(i));
+    // }
+    // }
+    // return totalPayments;
+    // }
+
+    public void reportPaymentsPerCarModel(ArrayList<String> carModels, ArrayList<Integer> counts,
+            ArrayList<Double> premiumPayments) {
+        System.out.println("\n--- Global Premium Report Per Car Model ---");
+        System.out.printf("%-25s %-25s %-25s%n", "Car Model", "Total Premium Payment", "Average Premium Payment");
+
+        for (int i = 0; i < carModels.size(); i++) {
+            String model = carModels.get(i);
+            int count = counts.get(i);
+            double totalPayment = premiumPayments.get(i);
+            double average = 0;
+            if (count > 0) {
+                average = totalPayment / count;
+            }
+            System.out.printf("%-25s $%,.2f \t\t     $%,.2f%n", model, totalPayment, average);
+        }
+    }
+
+    // void print() {
+    // for (User user : this.users) {
+    // user.print();
+    // user.printPolicies(this.flatRate);
+    // }
+    // }
+
+    // @Override
+    // public String toString() {
+    // String result = "Insurance Company: " + this.name + "\n";
+    // for (User user : this.users) {
+    // result += "\nUser #" + user.getUserID() + "\n";
+    // result += user.toString();
+    // }
+    // return result;
+    // }
+
+    // lab-4
+    public InsuranceCompany(
+            InsuranceCompany company) throws IllegalArgumentException, CloneNotSupportedException {
+        if (company.name == null || company.name.trim().isEmpty()) {
+            throw new IllegalArgumentException(
+                    "Company name cannot be empty.");
+        }
+        if (company.adminUsername == null || company.adminUsername.trim().isEmpty()) {
+            throw new IllegalArgumentException(
+                    "Admin username cannot be empty.");
+        }
+        if (company.adminPassword == null || company.adminPassword.trim().isEmpty()) {
+            throw new IllegalArgumentException(
+                    "Admin password cannot be empty.");
+        }
+        if (company.flatRate < 0) {
+            throw new IllegalArgumentException(
+                    "Flat rate cannot be negative.");
+        }
+        this.name = company.name;
+        this.users = new HashMap<Integer, User>();
+        for (User user : company.getUsers().values()) {
+            users.put(user.getUserID(), new User(user));
+        }
+        this.adminUsername = company.adminUsername;
+        this.adminPassword = company.adminPassword;
+        this.flatRate = company.flatRate;
+    }
+
+    // ArrayList<User> deepCopyUsers() throws CloneNotSupportedException {
+    // ArrayList<User> deepCopyList = new ArrayList<>();
+    // for (User user : this.users) {
+    // deepCopyList.add(user.clone());
+    // }
+    // return deepCopyList;
+    // }
+
+    // @Override
+    // public InsuranceCompany clone() throws CloneNotSupportedException {
+    // InsuranceCompany clonedCompany = (InsuranceCompany) super.clone();
+    // clonedCompany.users = deepCopyUsers();
+    // return clonedCompany;
+    // }
+
+    // ArrayList<User> shallowCopyUsers() {
+    // ArrayList<User> shallowCopyList = new ArrayList<>();
+    // for (User user : this.users) {
+    // shallowCopyList.add(user);
+    // }
+    // return shallowCopyList;
+    // }
+
+    // ArrayList<User> sortUsers() {
+    // ArrayList<User> sortedUsers = new ArrayList<>(this.users);
+    // Collections.sort(sortedUsers);
+    // return sortedUsers;
+    // }
+
+    // lab-5
+    public HashMap<Integer, User> getUsers() {
+        return this.users;
+    }
+
+    boolean addUser(User user) throws NullPointerException {
+        if (user == null) {
+            throw new NullPointerException(
+                    "User cannot be null.");
+        }
+        if (existsUser(user.getUserID())) {
+            return false;
+        }
+        this.users.put(user.getUserID(), user);
+        return true;
+    }
+
+    User findUser(int userID) {
+        return this.users.get(userID);
+        // throw new IllegalArgumentException(
+        // "User with ID " + userID + " not found.");
+    }
+
+    public boolean existsUser(int userID) {
+        if (this.users.get(userID) != null) {
+            return true;
+        }
+        return false;
+    }
+
+    double calcTotalPayments() {
+        double total = 0;
+        for (User user : this.users.values()) {
+            total += user.calcTotalPremiums(this.flatRate);
+        }
+        return total;
+    }
+
+    void carPriceRise(double risePercent) {
+        for (User user : this.users.values()) {
+            user.carPriceRiseAll(risePercent);
+        }
+    }
+
+    ArrayList<InsurancePolicy> allPolicies() {
+        ArrayList<InsurancePolicy> allCompanyPolicies = new ArrayList<>();
+        for (User user : this.users.values()) {
+            for (InsurancePolicy policy : user.getPolicies().values()) {
+                allCompanyPolicies.add(policy);
+            }
+        }
+        return allCompanyPolicies;
+    }
+
+    ArrayList<InsurancePolicy> filterByExpiryDate(int userID, MyDate date) {
+        User user = findUser(userID);
+        ArrayList<InsurancePolicy> filteredPolicies = new ArrayList<>();
+
+        for (InsurancePolicy policy : user.getPolicies().values()) {
+            if (policy.getExpiryDate().isExpired(date)) {
+                filteredPolicies.add(policy);
+            }
+        }
+        return filteredPolicies;
+    }
+
+    ArrayList<InsurancePolicy> filterByCarModel(String carModel) {
+        ArrayList<InsurancePolicy> filteredList = new ArrayList<>();
+
+        for (User user : this.users.values()) {
+            filteredList.addAll(user.filterByCarModel(carModel));
+        }
+
+        return filteredList;
+    }
+
+    ArrayList<InsurancePolicy> filterByExpiryDate(MyDate date) {
+        ArrayList<InsurancePolicy> filteredList = new ArrayList<>();
+
+        for (User user : this.users.values()) {
+            filteredList.addAll(user.filterByExpiryDate(date));
+        }
+
+        return filteredList;
+    }
+
+    ArrayList<String> populateDistinctCityNames() {
+        ArrayList<String> cities = new ArrayList<>();
+        for (User user : this.users.values()) {
+            if (!cities.contains(user.getAddress().getCity().toLowerCase())) {
+                cities.add(user.getAddress().getCity().toLowerCase());
+            } else
+                continue;
+        }
+        return cities;
+    }
+
+    double getTotalPaymentForCity(String city) {
+        double total = 0;
+        for (User user : this.users.values()) {
+            if (user.getAddress().getCity().toLowerCase().equalsIgnoreCase(city)) {
+                total += user.calcTotalPremiums(this.flatRate);
+            }
+        }
+        return total;
+    }
+
+    public boolean removeUser(int userID) {
+        return this.users.remove(userID) != null;
+    }
+
     ArrayList<String> populateDistinctCarModels() {
         ArrayList<String> allCarModels = new ArrayList<>();
-        for (User user : this.users) {
+        for (User user : this.users.values()) {
             ArrayList<String> userModels = user.populateDistinctCarModels();
             for (String model : userModels) {
                 boolean exists = false;
@@ -339,7 +597,7 @@ public class InsuranceCompany implements Cloneable {
         for (int i = 0; i < carModels.size(); i++) {
             totalCounts.add(0);
         }
-        for (User user : this.users) {
+        for (User user : this.users.values()) {
             ArrayList<Integer> userCounts = user.getTotalCountPerCarModel(carModels);
             for (int i = 0; i < userCounts.size(); i++) {
                 totalCounts.set(i, totalCounts.get(i) + userCounts.get(i));
@@ -355,7 +613,7 @@ public class InsuranceCompany implements Cloneable {
             totalPayments.add(0.0);
         }
 
-        for (User user : this.users) {
+        for (User user : this.users.values()) {
             ArrayList<Double> userPayments = user.getTotalPaymentPerCarModel(carModels, flatRate);
             for (int i = 0; i < userPayments.size(); i++) {
                 totalPayments.set(i, totalPayments.get(i) + userPayments.get(i));
@@ -364,25 +622,8 @@ public class InsuranceCompany implements Cloneable {
         return totalPayments;
     }
 
-    public void reportPaymentsPerCarModel(ArrayList<String> carModels, ArrayList<Integer> counts,
-            ArrayList<Double> premiumPayments) {
-        System.out.println("\n--- Global Premium Report Per Car Model ---");
-        System.out.printf("%-25s %-25s %-25s%n", "Car Model", "Total Premium Payment", "Average Premium Payment");
-
-        for (int i = 0; i < carModels.size(); i++) {
-            String model = carModels.get(i);
-            int count = counts.get(i);
-            double totalPayment = premiumPayments.get(i);
-            double average = 0;
-            if (count > 0) {
-                average = totalPayment / count;
-            }
-            System.out.printf("%-25s $%,.2f \t\t     $%,.2f%n", model, totalPayment, average);
-        }
-    }
-
     void print() {
-        for (User user : this.users) {
+        for (User user : this.users.values()) {
             user.print();
             user.printPolicies(this.flatRate);
         }
@@ -391,68 +632,132 @@ public class InsuranceCompany implements Cloneable {
     @Override
     public String toString() {
         String result = "Insurance Company: " + this.name + "\n";
-        for (User user : this.users) {
+        for (User user : this.users.values()) {
             result += "\nUser #" + user.getUserID() + "\n";
             result += user.toString();
         }
         return result;
     }
 
-    // lab-4
-    public InsuranceCompany(
-            InsuranceCompany company) throws IllegalArgumentException, CloneNotSupportedException {
-        if (company.name == null || company.name.trim().isEmpty()) {
-            throw new IllegalArgumentException(
-                    "Company name cannot be empty.");
+    ArrayList<User> deepCopyUsers() throws CloneNotSupportedException {
+        HashMap<Integer, User> deepCopyList = new HashMap<Integer, User>();
+        for (User user : this.users.values()) {
+            deepCopyList.put(user.getUserID(), user.clone());
         }
-        if (company.adminUsername == null || company.adminUsername.trim().isEmpty()) {
-            throw new IllegalArgumentException(
-                    "Admin username cannot be empty.");
-        }
-        if (company.adminPassword == null || company.adminPassword.trim().isEmpty()) {
-            throw new IllegalArgumentException(
-                    "Admin password cannot be empty.");
-        }
-        if (company.flatRate < 0) {
-            throw new IllegalArgumentException(
-                    "Flat rate cannot be negative.");
-        }
-        this.name = company.name;
-        this.users = new ArrayList<>();
-        for (User user : company.getUsers()) {
-            users.add(new User(user));
-        }
-        this.adminUsername = company.adminUsername;
-        this.adminPassword = company.adminPassword;
-        this.flatRate = company.flatRate;
+        return new ArrayList<User>(deepCopyList.values());
     }
 
-    ArrayList<User> deepCopyUsers() throws CloneNotSupportedException {
-        ArrayList<User> deepCopyList = new ArrayList<>();
-        for (User user : this.users) {
-            deepCopyList.add(user.clone());
+    ArrayList<User> shallowCopyUsers() {
+        HashMap<Integer, User> shallowCopyList = new HashMap<Integer, User>();
+        for (User user : this.users.values()) {
+            shallowCopyList.put(user.getUserID(), user);
+        }
+        return new ArrayList<User>(shallowCopyList.values());
+    }
+
+    // with HashMap input and output
+    HashMap<Integer, User> deepCopyUsersHashMap() throws CloneNotSupportedException {
+        HashMap<Integer, User> deepCopyList = new HashMap<Integer, User>();
+        for (User user : this.users.values()) {
+            deepCopyList.put(user.getUserID(), user.clone());
         }
         return deepCopyList;
+    }
+
+    HashMap<Integer, User> shallowCopyUsersHashMap() {
+        HashMap<Integer, User> shallowCopyList = new HashMap<Integer, User>();
+        for (User user : this.users.values()) {
+            shallowCopyList.put(user.getUserID(), user);
+        }
+        return shallowCopyList;
     }
 
     @Override
     public InsuranceCompany clone() throws CloneNotSupportedException {
         InsuranceCompany clonedCompany = (InsuranceCompany) super.clone();
-        clonedCompany.users = deepCopyUsers();
+        clonedCompany.users = deepCopyUsersHashMap();
         return clonedCompany;
     }
 
-    ArrayList<User> shallowCopyUsers() {
-        ArrayList<User> shallowCopyList = new ArrayList<>();
-        for (User user : this.users) {
-            shallowCopyList.add(user);
-        }
-        return shallowCopyList;
-    }
-
     ArrayList<User> sortUsers() {
-        ArrayList<User> sortedUsers = new ArrayList<>(this.users);
+        ArrayList<User> sortedUsers = new ArrayList<>(shallowCopyUsersHashMap().values());
         Collections.sort(sortedUsers);
         return sortedUsers;
     }
+
+    HashMap<String, Double> getTotalPremiumPerCity() {
+        final int flatRate = 19;
+        HashMap<String, Double> citiesAndPremium = new HashMap<String, Double>();
+        for (User user : this.users.values()) {
+            String city = user.getAddress().getCity();
+            Double payment = user.calcTotalPremiums(flatRate);
+
+            if (citiesAndPremium.get(city) != null) {
+                citiesAndPremium.put(city, citiesAndPremium.get(city) + payment);
+            } else {
+                citiesAndPremium.put(city, payment);
+            }
+        }
+        return citiesAndPremium;
+    }
+
+    HashMap<String, Integer> getTotalCountPerCarModel() {
+        HashMap<String, Integer> countsPerCarModel = new HashMap<String, Integer>();
+        for (User user : this.users.values()) {
+            HashMap<String, Integer> userCounts = user.getTotalCountPerCarModel();
+            for (String carModel : userCounts.keySet()) {
+                int count = userCounts.get(carModel);
+                if (countsPerCarModel.get(carModel) != null) {
+                    countsPerCarModel.put(carModel, countsPerCarModel.get(carModel) + count);
+                } else {
+                    countsPerCarModel.put(carModel, count);
+                }
+            }
+        }
+        return countsPerCarModel;
+    }
+
+    HashMap<String, Double> getTotalPremiumPerCarModel() {
+        final int flatRate = 19;
+        HashMap<String, Double> paymentsAndCarModel = new HashMap<String, Double>();
+        for (User user : this.users.values()) {
+            HashMap<String, Double> userPremiums = user.getTotalPremiumPerCarModel(flatRate);
+            for (String carModel : userPremiums.keySet()) {
+                double premium = userPremiums.get(carModel);
+                if (paymentsAndCarModel.get(carModel) != null) {
+                    paymentsAndCarModel.put(carModel, paymentsAndCarModel.get(carModel) + premium);
+                } else {
+                    paymentsAndCarModel.put(carModel, premium);
+                }
+            }
+        }
+        return paymentsAndCarModel;
+    }
+
+    void reportCity() {
+        System.out.printf("%-25s %-25s%n", "City", "Total Premium Payment");
+        HashMap<String, Double> data = getTotalPremiumPerCity();
+
+        for (String city : data.keySet()) {
+            double totalPayment = data.get(city);
+            System.out.printf("%-25s $%,.2f%n", city, totalPayment);
+        }
+    }
+
+    void reportCarModels() {
+        System.out.printf("%-25s %-25s %-25s%n", "Car Model", "Total Premium Payment", "Average Premium Payment");
+        HashMap<String, Double> data = getTotalPremiumPerCarModel();
+        HashMap<String, Integer> counts = getTotalCountPerCarModel();
+
+        for (String model : data.keySet()) {
+            int count = counts.get(model);
+            double totalPayment = data.get(model);
+            double average = 0;
+            if (count > 0) {
+                average = totalPayment / count;
+            }
+            System.out.printf("%-25s $%,.2f \t\t    $%,.2f%n", model, totalPayment, average);
+        }
+    }
+
 }
