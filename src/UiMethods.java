@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Scanner;
 
 public class UiMethods {
@@ -133,9 +134,13 @@ public class UiMethods {
         company.addUser(u4);
 
         Car car4 = new Car("Peugeot 206", CarType.HATCH, 2019, 30000);
+        Car car5 = new Car("Peugeot 206", CarType.HATCH, 2019, 30000);
         ComprehensivePolicy p4 = new ComprehensivePolicy("Reza Karimi", 311114, car4, 1, 22, 3,
                 new MyDate(2026, 8, 20));
+        ComprehensivePolicy p5 = new ComprehensivePolicy("Test Karimi", 311124, car5, 1, 22, 3,
+                new MyDate(2026, 8, 20));
         company.addPolicy(u4.getUserID(), p4);
+        company.addPolicy(u4.getUserID(), p5);
     }
 
     public static void createUser(InsuranceCompany company, Scanner inputReader) {
@@ -238,7 +243,7 @@ public class UiMethods {
 
     public static void filterByCarModel(InsuranceCompany company, Scanner inputReader) {
         String model = Helper.readNonEmptyString(inputReader, "Enter Car Model to filter: ");
-        ArrayList<InsurancePolicy> results = company.filterByCarModel(model);
+        HashMap<Integer, InsurancePolicy> results = company.filterByCarModel(model);
 
         if (results.isEmpty()) {
             System.out.println("No policies found for car model: " + model);

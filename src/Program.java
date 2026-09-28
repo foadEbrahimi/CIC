@@ -3,7 +3,7 @@ import java.util.Scanner;
 public class Program {
     static Scanner inputReader = new Scanner(System.in);
 
-    public static void main(String[] args) throws CloneNotSupportedException,PolicyException {
+    public static void main(String[] args) throws CloneNotSupportedException, PolicyException {
         boolean appRunning = true;
         while (appRunning) {
             Helper.clearConsole();

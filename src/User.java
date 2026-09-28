@@ -95,7 +95,7 @@ public class User implements Cloneable, Comparable<User> {
         InsurancePolicy.carPriceRiseAll(this.policies, risePercent);
     }
 
-    ArrayList<InsurancePolicy> filterByCarModel(String carModel) {
+    HashMap<Integer,InsurancePolicy> filterByCarModel(String carModel) {
         return InsurancePolicy.filterByCarModel(this.policies, carModel);
     }
 
@@ -393,6 +393,7 @@ public class User implements Cloneable, Comparable<User> {
         }
     }
 
+    // lab-5
     public static ArrayList<User> shallowCopy(HashMap<Integer, User> users) {
         ArrayList<User> shallowCopyList = new ArrayList<>();
         for (User user : users.values()) {
@@ -502,9 +503,9 @@ public class User implements Cloneable, Comparable<User> {
         return paymentsAndCarModel;
     }
 
-    void reportCarModels() {
+    void reportCarModels(int flatRate) {
         System.out.printf("%-25s %-25s %-25s%n", "Car Model", "Total Premium Payment", "Average Premium Payment");
-        HashMap<String, Double> data = getTotalPremiumPerCarModel(19);
+        HashMap<String, Double> data = getTotalPremiumPerCarModel(flatRate);
         HashMap<String, Integer> counts = getTotalCountPerCarModel();
 
         for (String model : data.keySet()) {

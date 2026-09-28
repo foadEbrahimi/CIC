@@ -213,7 +213,7 @@ public class InsuranceCompany implements Cloneable {
     // return allCompanyPolicies;
     // }
 
-    ArrayList<InsurancePolicy> filterByCarModel(int userID, String carModel) {
+    HashMap<Integer, InsurancePolicy> filterByCarModel(int userID, String carModel) {
         User user = findUser(userID);
         return user.filterByCarModel(carModel);
     }
@@ -527,11 +527,11 @@ public class InsuranceCompany implements Cloneable {
         return filteredPolicies;
     }
 
-    ArrayList<InsurancePolicy> filterByCarModel(String carModel) {
-        ArrayList<InsurancePolicy> filteredList = new ArrayList<>();
+    HashMap<Integer, InsurancePolicy> filterByCarModel(String carModel) {
+        HashMap<Integer, InsurancePolicy> filteredList = new HashMap<Integer, InsurancePolicy>();
 
         for (User user : this.users.values()) {
-            filteredList.addAll(user.filterByCarModel(carModel));
+            filteredList.putAll(user.filterByCarModel(carModel));
         }
 
         return filteredList;
@@ -686,11 +686,10 @@ public class InsuranceCompany implements Cloneable {
     }
 
     HashMap<String, Double> getTotalPremiumPerCity() {
-        final int flatRate = 19;
         HashMap<String, Double> citiesAndPremium = new HashMap<String, Double>();
         for (User user : this.users.values()) {
             String city = user.getAddress().getCity();
-            Double payment = user.calcTotalPremiums(flatRate);
+            Double payment = user.calcTotalPremiums(this.flatRate);
 
             if (citiesAndPremium.get(city) != null) {
                 citiesAndPremium.put(city, citiesAndPremium.get(city) + payment);
@@ -718,10 +717,9 @@ public class InsuranceCompany implements Cloneable {
     }
 
     HashMap<String, Double> getTotalPremiumPerCarModel() {
-        final int flatRate = 19;
         HashMap<String, Double> paymentsAndCarModel = new HashMap<String, Double>();
         for (User user : this.users.values()) {
-            HashMap<String, Double> userPremiums = user.getTotalPremiumPerCarModel(flatRate);
+            HashMap<String, Double> userPremiums = user.getTotalPremiumPerCarModel(this.flatRate);
             for (String carModel : userPremiums.keySet()) {
                 double premium = userPremiums.get(carModel);
                 if (paymentsAndCarModel.get(carModel) != null) {

@@ -366,7 +366,7 @@ public class Ui {
                     Helper.clearConsole();
                     User userReport = company.findUser(Helper.readInt(inputReader, "Enter a userID for Report: "));
                     if (userReport != null)
-                        userReport.reportCarModels();
+                        userReport.reportCarModels(company.getFlatRate());
                     else {
                         System.out.println("The user was not found for generating report");
                     }

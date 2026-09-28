@@ -17,7 +17,7 @@ public abstract class InsurancePolicy implements Cloneable, Comparable<Insurance
         this.id = id;
         if (!isValidID(id)) {
             int newID = Helper.generateRandomID(399999, 300000);
-            this.id = newID;
+            // this.id = newID;
             throw new PolicyException(newID);
         }
         this.car = car;
@@ -227,11 +227,12 @@ public abstract class InsurancePolicy implements Cloneable, Comparable<Insurance
         }
     }
 
-    static ArrayList<InsurancePolicy> filterByCarModel(HashMap<Integer, InsurancePolicy> policies, String carModel) {
-        ArrayList<InsurancePolicy> filteredList = new ArrayList<>();
+    static HashMap<Integer, InsurancePolicy> filterByCarModel(HashMap<Integer, InsurancePolicy> policies,
+            String carModel) {
+        HashMap<Integer, InsurancePolicy> filteredList = new HashMap<Integer, InsurancePolicy>();
         for (InsurancePolicy policy : policies.values()) {
             if (policy.getCar().getModel().toLowerCase().contains(carModel.toLowerCase())) {
-                filteredList.add(policy);
+                filteredList.put(policy.getId(), policy);
             }
         }
         return filteredList;

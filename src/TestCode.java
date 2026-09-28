@@ -316,12 +316,12 @@ public class TestCode {
                 // lab-5
                 System.out.println("----LAB-5 TESTING----");
                 System.out.println("---user 1 report By Car Model---");
-                u1.reportCarModels();
+                u1.reportCarModels(company.getFlatRate());
 
                 if (!company.getUsers().isEmpty()) {
                         User userForReport = company.getUsers().values().iterator().next();
                         System.out.println("---User Report: Car Models---");
-                        userForReport.reportCarModels();
+                        userForReport.reportCarModels(company.getFlatRate());
                 }
 
                 System.out.println("---Company Report: Cities---");
