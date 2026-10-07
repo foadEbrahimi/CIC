@@ -33,9 +33,6 @@ public class ThirdPartyPolicy extends InsurancePolicy {
 
     // lab-6
     public String toDilimatedString() {
-        return super.toDilimatedString() + ","
-                + car.toDilimatedString() + ","
-                + expiryDate.toDilimatedString() + ","
-                + "Third," + comments;
+        return super.toDilimatedString() + "Third," + comments;
     }
 }

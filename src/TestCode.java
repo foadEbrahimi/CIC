@@ -1,4 +1,3 @@
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -377,16 +376,9 @@ public class TestCode {
                 policies.put(policy1.getId(), policy1);
                 System.out.println("save to the file");
                 InsurancePolicy.save(policies, "policies.ser");
-                try {
-                        policies = InsurancePolicy.load("policies.ser");
-                        System.out.println("File loaded successfully");
-                } catch (FileNotFoundException e) {
-                        System.out.println("File not found");
-                } catch (ClassNotFoundException e) {
-                        System.out.println("Invalid class in file");
-                } catch (IOException e) {
-                        System.out.println("Error while reading the file");
-                }
+
+                policies = InsurancePolicy.load("policies.ser");
+
                 System.out.println("print loadedPolicies");
                 for (InsurancePolicy policy : policies.values()) {
                         policy.print();
@@ -402,16 +394,7 @@ public class TestCode {
                 User.save(users, "users.ser");
 
                 HashMap<Integer, User> loadedUsers = new HashMap<Integer, User>();
-                try {
-                        loadedUsers = User.load("users.ser");
-                        System.out.println("File loaded successfully");
-                } catch (FileNotFoundException e) {
-                        System.out.println("File not found");
-                } catch (ClassNotFoundException e) {
-                        System.out.println("Invalid class in file");
-                } catch (IOException e) {
-                        System.out.println("Error while reading the file");
-                }
+                loadedUsers = User.load("users.ser");
 
                 System.out.println("print loadedUsers");
                 for (User user : loadedUsers.values()) {
@@ -430,16 +413,10 @@ public class TestCode {
                 }
 
                 InsuranceCompany loadedCompany = new InsuranceCompany();
-                try {
-                        if (loadedCompany.load("company.ser")) {
-                                System.out.println("File loaded successfully");
-                        }
-                } catch (FileNotFoundException e) {
-                        System.out.println("File not found");
-                } catch (ClassNotFoundException e) {
-                        System.out.println("Invalid class in file");
-                } catch (IOException e) {
-                        System.out.println("Error while reading the file");
+                if (loadedCompany.load("company.ser")) {
+                        System.out.println("loaded successfully");
+                } else {
+                        System.out.println("File loaded successfully");
                 }
 
                 System.out.println(loadedCompany);
@@ -493,9 +470,13 @@ public class TestCode {
                 InsuranceCompany textCompany = new InsuranceCompany("Text Company Text", "admin", "1234", 100);
 
                 User user10 = new User("User10", new Address(10, "E", "F", "Isfahan"));
+                User user11 = new User("User11", new Address(11, "E", "F", "Kerman"));
                 user10.addPolicy(new ThirdPartyPolicy("UserC", 300008,
                                 new Car("Mazda", CarType.SED, 2022, 70000), 0, "ok", new MyDate(2028, 5, 1)));
+                user10.addPolicy(new ComprehensivePolicy("User12", 300019,
+                                new Car("Mazda", CarType.SED, 2022, 70000), 0, 12, 1, new MyDate(2030, 12, 23)));
                 textCompany.addUser(user10);
+                textCompany.addUser(user11);
 
                 if (textCompany.saveTextFile("company.txt")) {
                         System.out.println("save to the file successfully");

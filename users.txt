@@ -1,0 +1,4 @@
+user,0,Foad Ebrahimi,address,12,Valiasr,District 6,Tehran,policy,311111,Foad Ebrahimi,1,car,Mercedes-Benz CLS 350,LUX,2022,120000.0,date,2026,12,30,Third,Premium third-party policy
+user,1,Ali Rezaei,address,5,Azadi,District 2,Shiraz,policy,311112,Ali Rezaei,0,car,BMW X5,SUV,2021,200000.0,date,2026,10,10,Comprehensive,28,5
+user,2,Sara Mohammadi,address,20,Chaharbagh,District 1,Isfahan,policy,311113,Sara Mohammadi,2,car,Toyota Corolla,SED,2020,50000.0,date,2027,3,15,Third,Standard coverage
+user,3,Reza Karimi,address,88,Enghelab,District 11,Tehran,policy,311124,Test Karimi,1,car,Peugeot 206,HATCH,2019,30000.0,date,2026,8,20,Comprehensive,22,3,policy,311114,Reza Karimi,1,car,Peugeot 206,HATCH,2019,30000.0,date,2026,8,20,Comprehensive,22,3

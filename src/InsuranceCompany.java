@@ -1,5 +1,6 @@
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -777,41 +778,36 @@ public class InsuranceCompany implements Cloneable, Serializable {
     }
 
     // lab-6
-    Boolean load(String fileName) throws IOException, ClassNotFoundException {
-        ObjectInputStream inputFile = null;
+    Boolean load(String fileName) {
         try {
-            inputFile = new ObjectInputStream(
-                    Files.newInputStream(Paths.get(fileName)));
+            ObjectInputStream inputFile = new ObjectInputStream(Files.newInputStream(Paths.get(fileName)));
             InsuranceCompany loadedCompany = (InsuranceCompany) inputFile.readObject();
             this.name = loadedCompany.name;
             this.users = loadedCompany.users;
             this.adminUsername = loadedCompany.adminUsername;
             this.adminPassword = loadedCompany.adminPassword;
             this.flatRate = loadedCompany.flatRate;
-        } catch (IOException | ClassNotFoundException e) {
+            return true;
+        } catch (FileNotFoundException e) {
+            System.err.println("Error File not found: " + fileName);
             return false;
-        } finally {
-            if (inputFile != null) {
-                inputFile.close();
-            }
+        } catch (ClassNotFoundException e) {
+            System.err.println("Error Class not found in file: " + e.getMessage());
+            return false;
+        } catch (IOException e) {
+            System.err.println("Error reading binary file: " + e.getMessage());
+            return false;
         }
-        return true;
     }
 
-    Boolean save(String fileName) throws IOException {
-        ObjectOutputStream outputFile = null;
-        try {
-            outputFile = new ObjectOutputStream(
-                    Files.newOutputStream(Paths.get(fileName)));
+    Boolean save(String fileName) {
+        try (ObjectOutputStream outputFile = new ObjectOutputStream(Files.newOutputStream(Paths.get(fileName)))) {
             outputFile.writeObject(this);
+            return true;
         } catch (IOException e) {
+            System.err.println("Error writing binary file: " + e.getMessage());
             return false;
-        } finally {
-            if (outputFile != null) {
-                outputFile.close();
-            }
         }
-        return true;
     }
 
     // test for development
@@ -824,8 +820,9 @@ public class InsuranceCompany implements Cloneable, Serializable {
                 + this.adminPassword + "," + this.flatRate;
     }
 
-    Boolean saveTextFile(String fileName) throws IOException {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName));) {
+    Boolean saveTextFile(String fileName) {
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter(fileName));
             writer.write(this.toDilimatedString());
             writer.write("\n");
             for (User user : this.users.values()) {
@@ -835,6 +832,7 @@ public class InsuranceCompany implements Cloneable, Serializable {
             writer.close();
             return true;
         } catch (IOException e) {
+            System.err.println("Error writing text file: " + e.getMessage());
             return false;
         }
     }
@@ -910,7 +908,17 @@ public class InsuranceCompany implements Cloneable, Serializable {
             }
             reader.close();
             return true;
-        } catch (IOException | PolicyException | ArrayIndexOutOfBoundsException e) {
+        } catch (FileNotFoundException e) {
+            System.err.println("Error Text file not found: " + fileName);
+            return false;
+        } catch (ArrayIndexOutOfBoundsException e) {
+            System.err.println("Error File structure is invalid (missing fields)");
+            return false;
+        } catch (PolicyException e) {
+            System.err.println("Error Policy creation failed: " + e.toString());
+            return false;
+        } catch (IOException e) {
+            System.err.println("Error reading text file: " + e.getMessage());
             return false;
         }
     }

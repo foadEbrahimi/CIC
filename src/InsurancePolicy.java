@@ -1,6 +1,7 @@
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.EOFException;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -300,12 +301,10 @@ public abstract class InsurancePolicy implements Cloneable, Comparable<Insurance
     }
 
     // lab-6
-    static HashMap<Integer, InsurancePolicy> load(String fileName)
-            throws IOException, ClassNotFoundException {
+    static HashMap<Integer, InsurancePolicy> load(String fileName) {
         HashMap<Integer, InsurancePolicy> loadedPolicies = new HashMap<>();
-        ObjectInputStream inputFile = null;
         try {
-            inputFile = new ObjectInputStream(Files.newInputStream(Paths.get(fileName)));
+            ObjectInputStream inputFile = new ObjectInputStream(Files.newInputStream(Paths.get(fileName)));
             while (true) {
                 try {
                     InsurancePolicy policy = (InsurancePolicy) inputFile.readObject();
@@ -314,85 +313,105 @@ public abstract class InsurancePolicy implements Cloneable, Comparable<Insurance
                     break;
                 }
             }
-        } finally {
-            if (inputFile != null) {
-                inputFile.close();
-            }
+            return loadedPolicies;
+        } catch (FileNotFoundException e) {
+            System.err.println("Error File not found: " + fileName);
+            return null;
+        } catch (ClassNotFoundException e) {
+            System.err.println("Error Class not found: " + e.getMessage());
+            return null;
+        } catch (IOException e) {
+            System.err.println("Error reading binary file: " + e.getMessage());
+            return null;
         }
-        return loadedPolicies;
     }
 
-    static Boolean save(HashMap<Integer, InsurancePolicy> list, String fileName)
-            throws IOException {
-        ObjectOutputStream outputFile = null;
+    static Boolean save(HashMap<Integer, InsurancePolicy> policies, String fileName) {
         try {
-            outputFile = new ObjectOutputStream(
-                    Files.newOutputStream(Paths.get(fileName)));
-            for (InsurancePolicy policy : list.values()) {
+            ObjectOutputStream outputFile = new ObjectOutputStream(Files.newOutputStream(Paths.get(fileName)));
+            for (InsurancePolicy policy : policies.values()) {
                 outputFile.writeObject(policy);
             }
-        } finally {
-            if (outputFile != null) {
-                outputFile.close();
-            }
+            return true;
+        } catch (IOException e) {
+            System.err.println("Error writing binary file: " + e.getMessage());
+            return false;
         }
-        return true;
     }
 
     public String toDilimatedString() {
-        return "policy," + id + "," + policyHolderName + "," + numberOfClaims;
+        return "policy," + id + "," + policyHolderName + "," + numberOfClaims + "," + car.toDilimatedString() + ","
+                + expiryDate.toDilimatedString() + ",";
     }
 
     static HashMap<Integer, InsurancePolicy> loadTextFile(String fileName)
             throws IOException, PolicyException {
-        BufferedReader fileReader = new BufferedReader(new FileReader(fileName));
-        HashMap<Integer, InsurancePolicy> loadedPolicies = new HashMap<>();
-        String currentLine;
-        while ((currentLine = fileReader.readLine()) != null) {
-            currentLine = currentLine.trim();
-            if (currentLine.isEmpty())
-                continue;
-            String[] fields = currentLine.split(",", -1);
+        try {
+            BufferedReader fileReader = new BufferedReader(new FileReader(fileName));
+            HashMap<Integer, InsurancePolicy> loadedPolicies = new HashMap<>();
+            String currentLine;
+            while ((currentLine = fileReader.readLine()) != null) {
+                currentLine = currentLine.trim();
+                if (currentLine.isEmpty())
+                    continue;
+                String[] fields = currentLine.split(",", -1);
 
-            int id = Integer.parseInt(fields[1]);
-            String name = fields[2];
-            int numberOfClaims = Integer.parseInt(fields[3]);
+                int id = Integer.parseInt(fields[1]);
+                String name = fields[2];
+                int numberOfClaims = Integer.parseInt(fields[3]);
 
-            String carModel = fields[5];
-            CarType carType = CarType.valueOf(fields[6]);
-            int carYear = Integer.parseInt(fields[7]);
-            double carPrice = Double.parseDouble(fields[8]);
-            Car car = new Car(carModel, carType, carYear, carPrice);
+                String carModel = fields[5];
+                CarType carType = CarType.valueOf(fields[6]);
+                int carYear = Integer.parseInt(fields[7]);
+                double carPrice = Double.parseDouble(fields[8]);
+                Car car = new Car(carModel, carType, carYear, carPrice);
 
-            int year = Integer.parseInt(fields[10]);
-            int month = Integer.parseInt(fields[11]);
-            int day = Integer.parseInt(fields[12]);
-            MyDate date = new MyDate(year, month, day);
+                int year = Integer.parseInt(fields[10]);
+                int month = Integer.parseInt(fields[11]);
+                int day = Integer.parseInt(fields[12]);
+                MyDate date = new MyDate(year, month, day);
 
-            String type = fields[13];
-            InsurancePolicy policy;
-            if (type.equals("Third")) {
-                String comments = fields[14];
-                policy = new ThirdPartyPolicy(name, id, car, numberOfClaims, comments, date);
-            } else {
-                int driverAge = Integer.parseInt(fields[14]);
-                int level = Integer.parseInt(fields[15]);
-                policy = new ComprehensivePolicy(name, id, car, numberOfClaims, driverAge, level, date);
+                String type = fields[13];
+                InsurancePolicy policy;
+                if (type.equals("Third")) {
+                    String comments = fields[14];
+                    policy = new ThirdPartyPolicy(name, id, car, numberOfClaims, comments, date);
+                } else {
+                    int driverAge = Integer.parseInt(fields[14]);
+                    int level = Integer.parseInt(fields[15]);
+                    policy = new ComprehensivePolicy(name, id, car, numberOfClaims, driverAge, level, date);
+                }
+                loadedPolicies.put(id, policy);
             }
-            loadedPolicies.put(id, policy);
+            fileReader.close();
+            return loadedPolicies;
+        } catch (FileNotFoundException e) {
+            System.err.println("Error Text file not found: " + fileName);
+            return null;
+        } catch (ArrayIndexOutOfBoundsException e) {
+            System.err.println("Error File structure is invalid (missing fields)");
+            return null;
+        } catch (PolicyException e) {
+            System.err.println("Error Policy creation failed: " + e.toString());
+            return null;
+        } catch (IOException e) {
+            System.err.println("Error reading text file: " + e.getMessage());
+            return null;
         }
-        fileReader.close();
-        return loadedPolicies;
     }
 
-    static Boolean saveTextFile(HashMap<Integer, InsurancePolicy> policies, String fileName)
-            throws IOException {
-        BufferedWriter fileWriter = new BufferedWriter(new FileWriter(fileName));
-        for (InsurancePolicy policy : policies.values()) {
-            fileWriter.write(policy.toDilimatedString());
-            fileWriter.write("\n");
+    static Boolean saveTextFile(HashMap<Integer, InsurancePolicy> policies, String fileName) {
+        try {
+            BufferedWriter fileWriter = new BufferedWriter(new FileWriter(fileName));
+            for (InsurancePolicy policy : policies.values()) {
+                fileWriter.write(policy.toDilimatedString());
+                fileWriter.write("\n");
+            }
+            fileWriter.close();
+            return true;
+        } catch (IOException e) {
+            System.err.println("Error writing text file: " + e.getMessage());
+            return false;
         }
-        fileWriter.close();
-        return true;
     }
 }

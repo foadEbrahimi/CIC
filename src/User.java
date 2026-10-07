@@ -1,6 +1,7 @@
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.EOFException;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -532,120 +533,137 @@ public class User implements Cloneable, Comparable<User>, Serializable {
 
     // lab-6
     // binary-file
-    static HashMap<Integer, User> load(String fileName)
-            throws IOException, ClassNotFoundException {
-        HashMap<Integer, User> loadedUsers = new HashMap<Integer, User>();
-        ObjectInputStream inputFile = null;
+    static HashMap<Integer, User> load(String fileName) {
+        HashMap<Integer, User> loadedUsers = new HashMap<>();
         try {
-            inputFile = new ObjectInputStream(
-                    Files.newInputStream(Paths.get(fileName)));
+            ObjectInputStream inputFile = new ObjectInputStream(Files.newInputStream(Paths.get(fileName)));
             while (true) {
                 try {
                     User user = (User) inputFile.readObject();
                     loadedUsers.put(user.getUserID(), user);
-                } catch (EOFException ex) {
+                } catch (EOFException e) {
                     break;
                 }
             }
-        } finally {
-            if (inputFile != null) {
-                inputFile.close();
-            }
+            return loadedUsers;
+        } catch (FileNotFoundException e) {
+            System.err.println("Error File not found: " + fileName);
+            return null;
+        } catch (ClassNotFoundException e) {
+            System.err.println("Error Class not found: " + e.getMessage());
+            return null;
+        } catch (IOException e) {
+            System.err.println("Error reading binary file: " + e.getMessage());
+            return null;
         }
-        return loadedUsers;
     }
 
-    static Boolean save(HashMap<Integer, User> usersList, String fileName)
-            throws IOException {
-        ObjectOutputStream outputFile = null;
+    static Boolean save(HashMap<Integer, User> users, String fileName) {
         try {
-            outputFile = new ObjectOutputStream(
-                    Files.newOutputStream(Paths.get(fileName)));
-            for (User user : usersList.values()) {
+            ObjectOutputStream outputFile = new ObjectOutputStream(Files.newOutputStream(Paths.get(fileName)));
+            for (User user : users.values()) {
                 outputFile.writeObject(user);
             }
-        } finally {
-            if (outputFile != null) {
-                outputFile.close();
-            }
+            outputFile.close();
+            return true;
+        } catch (IOException e) {
+            System.err.println("Error writing binary file: " + e.getMessage());
+            return false;
         }
-        return true;
     }
 
     // text-file
     static HashMap<Integer, User> loadTextFile(String fileName)
             throws IOException, PolicyException {
-        BufferedReader fileReader = new BufferedReader(new FileReader(fileName));
-        HashMap<Integer, User> loadedUsers = new HashMap<>();
-        String currentLine;
-        while ((currentLine = fileReader.readLine()) != null) {
-            currentLine = currentLine.trim();
-            if (currentLine.isEmpty())
-                continue;
+        try {
+            BufferedReader fileReader = new BufferedReader(new FileReader(fileName));
+            HashMap<Integer, User> loadedUsers = new HashMap<>();
+            String currentLine;
+            while ((currentLine = fileReader.readLine()) != null) {
+                currentLine = currentLine.trim();
+                if (currentLine.isEmpty())
+                    continue;
 
-            String[] fields = currentLine.split(",", -1);
-            int userID = Integer.parseInt(fields[1]);
-            String name = fields[2];
-            int streetNum = Integer.parseInt(fields[4]);
-            String street = fields[5];
-            String suburb = fields[6];
-            String city = fields[7];
-            Address address = new Address(streetNum, street, suburb, city);
-            User user = new User(name, address);
+                String[] fields = currentLine.split(",", -1);
+                int userID = Integer.parseInt(fields[1]);
+                String name = fields[2];
+                int streetNum = Integer.parseInt(fields[4]);
+                String street = fields[5];
+                String suburb = fields[6];
+                String city = fields[7];
+                Address address = new Address(streetNum, street, suburb, city);
+                User user = new User(name, address);
 
-            int i = 8;
-            while (i < fields.length) {
-                int policyID = Integer.parseInt(fields[i + 1]);
-                String policyHolderName = fields[i + 2];
-                int numberOfClaims = Integer.parseInt(fields[i + 3]);
+                int i = 8;
+                while (i < fields.length) {
+                    int policyID = Integer.parseInt(fields[i + 1]);
+                    String policyHolderName = fields[i + 2];
+                    int numberOfClaims = Integer.parseInt(fields[i + 3]);
 
-                String carModel = fields[i + 5];
-                CarType carType = CarType.valueOf(fields[i + 6]);
-                int carYear = Integer.parseInt(fields[i + 7]);
-                double carPrice = Double.parseDouble(fields[i + 8]);
-                Car car = new Car(carModel, carType, carYear, carPrice);
+                    String carModel = fields[i + 5];
+                    CarType carType = CarType.valueOf(fields[i + 6]);
+                    int carYear = Integer.parseInt(fields[i + 7]);
+                    double carPrice = Double.parseDouble(fields[i + 8]);
+                    Car car = new Car(carModel, carType, carYear, carPrice);
 
-                int year = Integer.parseInt(fields[i + 10]);
-                int month = Integer.parseInt(fields[i + 11]);
-                int day = Integer.parseInt(fields[i + 12]);
-                MyDate date = new MyDate(year, month, day);
+                    int year = Integer.parseInt(fields[i + 10]);
+                    int month = Integer.parseInt(fields[i + 11]);
+                    int day = Integer.parseInt(fields[i + 12]);
+                    MyDate date = new MyDate(year, month, day);
 
-                String policyType = fields[i + 13];
-                int policyLength;
-                InsurancePolicy policy;
-                if (policyType.equals("Third")) {
-                    String comments = fields[i + 14];
-                    policy = new ThirdPartyPolicy(policyHolderName, policyID, car, numberOfClaims, comments, date);
-                    // اینجا میشه نقطه ای که اطلاعات پالیسی تموم میشه و چون پالیسی از نوع third 15
-                    // تا فیلد داره پالیسی بعدیمون باید
-                    // از ایندکس 8 که شروع پالیسی ها هست + 15 بشه تا برسیم به پالیسی بعدی
-                    policyLength = 15;
-                } else {
-                    int driverAge = Integer.parseInt(fields[i + 14]);
-                    int level = Integer.parseInt(fields[i + 15]);
-                    policy = new ComprehensivePolicy(policyHolderName, policyID, car, numberOfClaims, driverAge, level,
-                            date);
-                    // اینجا هم همینطور اما 16 چون پالیسی از این نوع 16 تا فیلد داره
-                    policyLength = 16;
+                    String policyType = fields[i + 13];
+                    int policyLength;
+                    InsurancePolicy policy;
+                    if (policyType.equals("Third")) {
+                        String comments = fields[i + 14];
+                        policy = new ThirdPartyPolicy(policyHolderName, policyID, car, numberOfClaims, comments, date);
+                        // اینجا میشه نقطه ای که اطلاعات پالیسی تموم میشه و چون پالیسی از نوع third 15
+                        // تا فیلد داره پالیسی بعدیمون باید
+                        // از ایندکس 8 که شروع پالیسی ها هست + 15 بشه تا برسیم به پالیسی بعدی
+                        policyLength = 15;
+                    } else {
+                        int driverAge = Integer.parseInt(fields[i + 14]);
+                        int level = Integer.parseInt(fields[i + 15]);
+                        policy = new ComprehensivePolicy(policyHolderName, policyID, car, numberOfClaims, driverAge,
+                                level,
+                                date);
+                        // اینجا هم همینطور اما 16 چون پالیسی از این نوع 16 تا فیلد داره
+                        policyLength = 16;
+                    }
+                    user.addPolicy(policy);
+                    i += policyLength;
                 }
-                user.addPolicy(policy);
-                i += policyLength;
+                loadedUsers.put(userID, user);
             }
-            loadedUsers.put(userID, user);
+            fileReader.close();
+            return loadedUsers;
+
+        } catch (FileNotFoundException e) {
+            System.err.println("Error Text file not found: " + fileName);
+            return null;
+        } catch (ArrayIndexOutOfBoundsException e) {
+            System.err.println("Error File structure is invalid");
+            return null;
+        } catch (PolicyException e) {
+            System.err.println("Error Policy creation failed: " + e.toString());
+            return null;
+        } catch (IOException e) {
+            System.err.println("Error reading text file: " + e.getMessage());
+            return null;
         }
-        fileReader.close();
-        return loadedUsers;
     }
 
-    static Boolean saveTextFile(String fileName, HashMap<Integer, User> users)
-            throws IOException {
-        try (BufferedWriter fileWriter = new BufferedWriter(new FileWriter(fileName))) {
+    static Boolean saveTextFile(String fileName, HashMap<Integer, User> users) {
+        try {
+            BufferedWriter fileWriter = new BufferedWriter(new FileWriter(fileName));
             for (User user : users.values()) {
                 fileWriter.write(user.toDilimatedString());
                 fileWriter.write("\n");
             }
+            fileWriter.close();
             return true;
         } catch (IOException e) {
+            System.err.println("Error writing text file: " + e.getMessage());
             return false;
         }
     }

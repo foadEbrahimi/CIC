@@ -344,100 +344,86 @@ public class UiMethods {
 
     // lab-6
     public static void saveCompanyBinary(InsuranceCompany company) {
-        try {
-            if (company.save("company.ser")) {
-                System.out.println("company information saved to company.ser successfully");
-            } else {
-                System.out.println("failed to save company to binary file");
-            }
-        } catch (IOException e) {
-            System.out.println("error while saving binary file: " + e.getMessage());
+        if (company.save("company.ser")) {
+            System.out.println("Company information saved to company.ser successfully.");
+        } else {
+            System.out.println("Failed to save company to binary file.");
         }
     }
 
     public static void loadCompanyBinary(InsuranceCompany company) {
-        try {
-            if (company.load("company.ser")) {
-                System.out.println("company information loaded from company.ser successfully");
-            } else {
-                System.out.println("failed to load company from binary file");
-            }
-        } catch (IOException | ClassNotFoundException e) {
-            System.out.println("error while loading binary file: " + e.getMessage());
+        if (company.load("company.ser")) {
+            System.out.println("Company information loaded from company.ser successfully.");
+        } else {
+            System.out.println("Failed to load company from binary file.");
         }
     }
 
     public static void saveCompanyText(InsuranceCompany company) {
-        try {
-            if (company.saveTextFile("company.txt")) {
-                System.out.println("company information saved to company.txt successfully");
-            } else {
-                System.out.println("failed to save company to text file");
-            }
-        } catch (IOException e) {
-            System.out.println("error while saving text file: " + e.getMessage());
+        if (company.saveTextFile("company.txt")) {
+            System.out.println("Company information saved to company.txt successfully.");
+        } else {
+            System.out.println("Failed to save company to text file.");
         }
     }
 
     public static void loadCompanyText(InsuranceCompany company) {
         try {
             if (company.loadTextFile("company.txt")) {
-                System.out.println("company information loaded from company.txt successfully");
+                System.out.println("Company information loaded from company.txt successfully.");
             } else {
-                System.out.println("failed to load company from text file");
+                System.out.println("Failed to load company from text file.");
             }
-        } catch (IOException | PolicyException e) {
-            System.out.println("error while loading text file: " + e.getMessage());
+        } catch (PolicyException e) {
+            System.out.println("Error: Policy creation failed: " + e.toString());
+        } catch (IOException e) {
+            System.out.println("Error while loading text file: " + e.getMessage());
         }
     }
 
-    public static void savePoliciesBinary(InsuranceCompany company, Scanner inputReader) throws IOException {
+    public static void savePoliciesBinary(InsuranceCompany company, Scanner inputReader) {
         if (company.getUsers().isEmpty()) {
-            System.out.println("there is no user in the company to save");
+            System.out.println("There is no user in the company to save.");
             return;
         }
         int userID = Helper.readInt(inputReader, "Enter User ID: ");
         User user = company.findUser(userID);
         if (user == null) {
-            System.out.println("User not found");
+            System.out.println("User not found.");
             return;
         }
         if (InsurancePolicy.save(user.getPolicies(), "policies.ser")) {
-            System.out.println("Policies information saved to policies.ser successfully");
+            System.out.println("Policies information saved to policies.ser successfully.");
         } else {
-            System.out.println("failed to save policies to binary file");
+            System.out.println("Failed to save policies to binary file.");
         }
     }
 
-    public static void loadPoliciesBinary() throws ClassNotFoundException, IOException {
+    public static void loadPoliciesBinary() {
         HashMap<Integer, InsurancePolicy> policies = InsurancePolicy.load("policies.ser");
         if (policies == null || policies.isEmpty()) {
-            System.out.println("failed to load policies or file is empty");
+            System.out.println("Failed to load policies or file is empty.");
         } else {
-            System.out.println("Loaded information policies from policies.ser");
+            System.out.println("Loaded policies from policies.ser:");
             InsurancePolicy.printPolicies(policies);
         }
     }
 
     public static void savePoliciesText(InsuranceCompany company, Scanner inputReader) {
         if (company.getUsers().isEmpty()) {
-            System.out.println("No users in the company");
+            System.out.println("No users in the company.");
             return;
         }
         int userID = Helper.readInt(inputReader, "Enter User ID: ");
         User user = company.findUser(userID);
         if (user == null) {
-            System.out.println("User not found");
+            System.out.println("User not found.");
             return;
         }
-        try {
-            if (InsurancePolicy.saveTextFile(user.getPolicies(), "policies.txt")) {
-                System.out.println("policies information saved to policies.txt successfully");
-            } else {
-                System.out.println("failed to save policies to text file");
-            }
-        } catch (IOException e) {
-            System.out.println("error while saving text file: " + e.getMessage());
+        if (InsurancePolicy.saveTextFile(user.getPolicies(), "policies.txt")) {
+            System.out.println("Policies information saved to policies.txt successfully.");
+        } else {
+            System.out.println("Failed to save policies to text file.");
         }
     }
 
@@ -445,30 +431,32 @@ public class UiMethods {
         try {
             HashMap<Integer, InsurancePolicy> policies = InsurancePolicy.loadTextFile("policies.txt");
             if (policies == null || policies.isEmpty()) {
-                System.out.println("failed to load policies or file is empty");
+                System.out.println("Failed to load policies or file is empty.");
             } else {
-                System.out.println("Loaded information policies from policies.txt");
+                System.out.println("Loaded policies from policies.txt:");
                 InsurancePolicy.printPolicies(policies);
             }
-        } catch (IOException | PolicyException e) {
-            System.out.println("error while loading text file: " + e.getMessage());
+        } catch (PolicyException e) {
+            System.out.println("Error: Policy creation failed: " + e.toString());
+        } catch (IOException e) {
+            System.out.println("Error while loading text file: " + e.getMessage());
         }
     }
 
-    public static void saveUsersBinary(InsuranceCompany company) throws IOException {
+    public static void saveUsersBinary(InsuranceCompany company) {
         if (User.save(company.getUsers(), "users.ser")) {
-            System.out.println("Users information saved to users.ser successfully");
+            System.out.println("Users information saved to users.ser successfully.");
         } else {
-            System.out.println("failed to save users to binary file");
+            System.out.println("Failed to save users to binary file.");
         }
     }
 
-    public static void loadUsersBinary() throws ClassNotFoundException, IOException {
+    public static void loadUsersBinary() {
         HashMap<Integer, User> users = User.load("users.ser");
         if (users == null || users.isEmpty()) {
-            System.out.println("failed to load users or file is empty");
+            System.out.println("Failed to load users or file is empty.");
         } else {
-            System.out.println("Loaded information users from users.ser");
+            System.out.println("Loaded users from users.ser:");
             for (User user : users.values()) {
                 user.print();
             }
@@ -476,14 +464,10 @@ public class UiMethods {
     }
 
     public static void saveUsersText(InsuranceCompany company) {
-        try {
-            if (User.saveTextFile("users.txt", company.getUsers())) {
-                System.out.println("Users information saved to users.txt successfully");
-            } else {
-                System.out.println("failed to save users to text file");
-            }
-        } catch (IOException e) {
-            System.out.println("error while saving text file: " + e.getMessage());
+        if (User.saveTextFile("users.txt", company.getUsers())) {
+            System.out.println("Users information saved to users.txt successfully.");
+        } else {
+            System.out.println("Failed to save users to text file.");
         }
     }
 
@@ -491,15 +475,17 @@ public class UiMethods {
         try {
             HashMap<Integer, User> users = User.loadTextFile("users.txt");
             if (users == null || users.isEmpty()) {
-                System.out.println("failed to load users or file is empty");
+                System.out.println("Failed to load users or file is empty.");
             } else {
-                System.out.println("Loaded information users from users.txt");
+                System.out.println("Loaded users from users.txt:");
                 for (User user : users.values()) {
                     user.print();
                 }
             }
-        } catch (IOException | PolicyException e) {
-            System.out.println("error while loading text file: " + e.getMessage());
+        } catch (PolicyException e) {
+            System.out.println("Error: Policy creation failed: " + e.toString());
+        } catch (IOException e) {
+            System.out.println("Error while loading text file: " + e.getMessage());
         }
     }
 }

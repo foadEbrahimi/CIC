@@ -48,9 +48,6 @@ public class ComprehensivePolicy extends InsurancePolicy {
 
     // lab-6
     public String toDilimatedString() {
-        return super.toDilimatedString() + ","
-                + car.toDilimatedString() + ","
-                + expiryDate.toDilimatedString() + ","
-                + "Comprehensive," + driverAge + "," + level;
+        return super.toDilimatedString() + "Comprehensive," + driverAge + "," + level;
     }
 }
