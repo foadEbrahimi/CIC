@@ -1,10 +1,11 @@
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Ui {
 
     public static void coreTest(Scanner inputReader)
-            throws CloneNotSupportedException, IllegalArgumentException, PolicyException {
+            throws CloneNotSupportedException, IllegalArgumentException, PolicyException, IOException {
         InsuranceCompany company = new InsuranceCompany("Pars Insurance", "admin", "1234", 100);
         UiMethods.initializeSampleData(company);
         boolean loggedIn = false;
@@ -81,7 +82,8 @@ public class Ui {
         }
     }
 
-    public static void standardTest(Scanner inputReader) throws CloneNotSupportedException, PolicyException {
+    public static void standardTest(Scanner inputReader)
+            throws CloneNotSupportedException, PolicyException, IOException, ClassNotFoundException {
         InsuranceCompany company = new InsuranceCompany("Pars Insurance", "admin", "1234", 100);
         UiMethods.initializeSampleData(company);
 
@@ -112,7 +114,8 @@ public class Ui {
         }
     }
 
-    public static void advanceTest(Scanner inputReader) throws CloneNotSupportedException, PolicyException {
+    public static void advanceTest(Scanner inputReader)
+            throws CloneNotSupportedException, PolicyException, IOException, ClassNotFoundException {
         InsuranceCompany company = new InsuranceCompany("Pars Insurance", "admin", "1234", 100);
         UiMethods.initializeSampleData(company);
         boolean mainMenuRunning = true;
@@ -143,7 +146,7 @@ public class Ui {
     }
 
     private static void handleAdminLogin(InsuranceCompany company, Scanner inputReader, boolean isAdvanced)
-            throws CloneNotSupportedException, PolicyException {
+            throws CloneNotSupportedException, PolicyException, IOException, ClassNotFoundException {
         Helper.clearConsole();
         System.out.println("\n--- ADMIN LOGIN ---");
         String user = Helper.readNonEmptyString(inputReader, "Username: ");
@@ -183,7 +186,7 @@ public class Ui {
     }
 
     private static void standardAdminMenu(InsuranceCompany company, Scanner inputReader)
-            throws CloneNotSupportedException, PolicyException {
+            throws CloneNotSupportedException, PolicyException, IllegalArgumentException, IOException {
         boolean adminRunning = true;
         while (adminRunning) {
             Helper.clearConsole();
@@ -262,7 +265,8 @@ public class Ui {
     }
 
     private static void advancedAdminMenu(InsuranceCompany company, Scanner inputReader)
-            throws CloneNotSupportedException, IllegalArgumentException, PolicyException {
+            throws CloneNotSupportedException, IllegalArgumentException, PolicyException, IOException,
+            ClassNotFoundException {
         boolean adminRunning = true;
         while (adminRunning) {
             Helper.clearConsole();
@@ -286,10 +290,25 @@ public class Ui {
             System.out.println("16. Report: Car Models for a Given User");
             System.out.println("17. Report: City Premiums (All Users)");
             System.out.println("18. Report: Car Models (All Users)");
-            System.out.println("19. Log Out");
+            // lab-6
+            System.out.println("19. Save Company (Binary)");
+            System.out.println("20. Load Company (Binary)");
+            System.out.println("21. Save Company (Text)");
+            System.out.println("22. Load Company (Text)");
+
+            System.out.println("23. Save Policies (Binary)");
+            System.out.println("24. Load Policies (Binary)");
+            System.out.println("25. Save Policies (Text)");
+            System.out.println("26. Load Policies (Text)");
+
+            System.out.println("27. Save Users (Binary)");
+            System.out.println("28. Load Users (Binary)");
+            System.out.println("29. Save Users (Text)");
+            System.out.println("30. Load Users (Text)");
+            System.out.println("31. Log Out");
             System.out.print("Select an option: ");
 
-            int choice = Helper.readValidInt(inputReader, "", 1, 19);
+            int choice = Helper.readValidInt(inputReader, "", 1, 31);
             switch (choice) {
                 case 1:
                     Helper.clearConsole();
@@ -380,7 +399,55 @@ public class Ui {
                     company.reportCarModels();
                     break;
                 case 19:
-                    System.out.println("Logging out...");
+                    Helper.clearConsole();
+                    UiMethods.saveCompanyBinary(company);
+                    break;
+                case 20:
+                    Helper.clearConsole();
+                    UiMethods.loadCompanyBinary(company);
+                    break;
+                case 21:
+                    Helper.clearConsole();
+                    UiMethods.saveCompanyText(company);
+                    break;
+                case 22:
+                    Helper.clearConsole();
+                    UiMethods.loadCompanyText(company);
+                    break;
+                case 23:
+                    Helper.clearConsole();
+                    UiMethods.savePoliciesBinary(company, inputReader);
+                    break;
+                case 24:
+                    Helper.clearConsole();
+                    UiMethods.loadPoliciesBinary();
+                    break;
+                case 25:
+                    Helper.clearConsole();
+                    UiMethods.savePoliciesText(company, inputReader);
+                    break;
+                case 26:
+                    Helper.clearConsole();
+                    UiMethods.loadPoliciesText();
+                    break;
+                case 27:
+                    Helper.clearConsole();
+                    UiMethods.saveUsersBinary(company);
+                    break;
+                case 28:
+                    Helper.clearConsole();
+                    UiMethods.loadUsersBinary();
+                    break;
+                case 29:
+                    Helper.clearConsole();
+                    UiMethods.saveUsersText(company);
+                    break;
+                case 30:
+                    Helper.clearConsole();
+                    UiMethods.loadUsersText();
+                    break;
+                case 31:
+                    System.out.println("Logging out");
                     adminRunning = false;
                     break;
                 default:

@@ -1,8 +1,18 @@
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 
-public class InsuranceCompany implements Cloneable {
+public class InsuranceCompany implements Cloneable, Serializable {
     String name;
     // private ArrayList<User> users;
     private HashMap<Integer, User> users = new HashMap<Integer, User>();
@@ -758,4 +768,150 @@ public class InsuranceCompany implements Cloneable {
         }
     }
 
+    public InsuranceCompany() {
+        this.name = "";
+        this.users = new HashMap<>();
+        this.adminUsername = "";
+        this.adminPassword = "";
+        this.flatRate = 0;
+    }
+
+    // lab-6
+    Boolean load(String fileName) throws IOException, ClassNotFoundException {
+        ObjectInputStream inputFile = null;
+        try {
+            inputFile = new ObjectInputStream(
+                    Files.newInputStream(Paths.get(fileName)));
+            InsuranceCompany loadedCompany = (InsuranceCompany) inputFile.readObject();
+            this.name = loadedCompany.name;
+            this.users = loadedCompany.users;
+            this.adminUsername = loadedCompany.adminUsername;
+            this.adminPassword = loadedCompany.adminPassword;
+            this.flatRate = loadedCompany.flatRate;
+        } catch (IOException | ClassNotFoundException e) {
+            return false;
+        } finally {
+            if (inputFile != null) {
+                inputFile.close();
+            }
+        }
+        return true;
+    }
+
+    Boolean save(String fileName) throws IOException {
+        ObjectOutputStream outputFile = null;
+        try {
+            outputFile = new ObjectOutputStream(
+                    Files.newOutputStream(Paths.get(fileName)));
+            outputFile.writeObject(this);
+        } catch (IOException e) {
+            return false;
+        } finally {
+            if (outputFile != null) {
+                outputFile.close();
+            }
+        }
+        return true;
+    }
+
+    // test for development
+    void clear() {
+        this.getUsers().clear();
+    }
+
+    public String toDilimatedString() {
+        return "company," + this.name + "," + this.adminUsername + ","
+                + this.adminPassword + "," + this.flatRate;
+    }
+
+    Boolean saveTextFile(String fileName) throws IOException {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName));) {
+            writer.write(this.toDilimatedString());
+            writer.write("\n");
+            for (User user : this.users.values()) {
+                writer.write(user.toDilimatedString());
+                writer.write("\n");
+            }
+            writer.close();
+            return true;
+        } catch (IOException e) {
+            return false;
+        }
+    }
+
+    Boolean loadTextFile(String fileName)
+            throws IOException, PolicyException, ArrayIndexOutOfBoundsException {
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader(fileName));
+            this.users = new HashMap<>();
+            String currentLine = reader.readLine();
+            if (currentLine != null) {
+                currentLine = currentLine.trim();
+                if (!currentLine.isEmpty()) {
+                    String[] companyFields = currentLine.split(",", -1);
+                    this.name = companyFields[1];
+                    this.adminUsername = companyFields[2];
+                    this.adminPassword = companyFields[3];
+                    this.flatRate = Integer.parseInt(companyFields[4]);
+                }
+            }
+
+            while ((currentLine = reader.readLine()) != null) {
+                currentLine = currentLine.trim();
+                if (currentLine.isEmpty())
+                    continue;
+
+                String[] fields = currentLine.split(",", -1);
+                int userID = Integer.parseInt(fields[1]);
+                String userName = fields[2];
+                int streetNum = Integer.parseInt(fields[4]);
+                String street = fields[5];
+                String suburb = fields[6];
+                String city = fields[7];
+                Address address = new Address(streetNum, street, suburb, city);
+                User user = new User(userName, address);
+
+                int i = 8;
+                while (i < fields.length) {
+                    int policyID = Integer.parseInt(fields[i + 1]);
+                    String policyHolderName = fields[i + 2];
+                    int numberOfClaims = Integer.parseInt(fields[i + 3]);
+
+                    String carModel = fields[i + 5];
+                    CarType carType = CarType.valueOf(fields[i + 6]);
+                    int carYear = Integer.parseInt(fields[i + 7]);
+                    double carPrice = Double.parseDouble(fields[i + 8]);
+                    Car car = new Car(carModel, carType, carYear, carPrice);
+
+                    int year = Integer.parseInt(fields[i + 10]);
+                    int month = Integer.parseInt(fields[i + 11]);
+                    int day = Integer.parseInt(fields[i + 12]);
+                    MyDate date = new MyDate(year, month, day);
+
+                    String policyType = fields[i + 13];
+                    InsurancePolicy policy;
+                    int policyLength;
+                    if (policyType.equals("Third")) {
+                        String comments = fields[i + 14];
+                        policy = new ThirdPartyPolicy(policyHolderName, policyID, car,
+                                numberOfClaims, comments, date);
+                        policyLength = 15;
+                    } else {
+                        int driverAge = Integer.parseInt(fields[i + 14]);
+                        int level = Integer.parseInt(fields[i + 15]);
+                        policy = new ComprehensivePolicy(policyHolderName, policyID, car,
+                                numberOfClaims, driverAge, level, date);
+                        policyLength = 16;
+                    }
+                    user.addPolicy(policy);
+                    i += policyLength;
+                }
+                this.users.put(userID, user);
+            }
+            reader.close();
+            return true;
+        } catch (IOException | PolicyException | ArrayIndexOutOfBoundsException e) {
+            return false;
+        }
+    }
 }

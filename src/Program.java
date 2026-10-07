@@ -1,9 +1,11 @@
+import java.io.IOException;
 import java.util.Scanner;
 
 public class Program {
     static Scanner inputReader = new Scanner(System.in);
 
-    public static void main(String[] args) throws CloneNotSupportedException, PolicyException {
+    public static void main(String[] args)
+            throws CloneNotSupportedException, PolicyException, IOException, ClassNotFoundException {
         boolean appRunning = true;
         while (appRunning) {
             Helper.clearConsole();
@@ -15,9 +17,8 @@ public class Program {
             System.out.println("2. Standard Level Test");
             System.out.println("3. Advanced Level Test");
             System.out.println("0. Exit");
-            System.out.print("Enter your choice: ");
 
-            int levelChoice = Helper.readValidInt(inputReader, "", 0, 3);
+            int levelChoice = Helper.readValidInt(inputReader, "Enter your choice: ", 0, 3);
             switch (levelChoice) {
                 case 1:
                     Helper.clearConsole();

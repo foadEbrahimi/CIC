@@ -45,4 +45,12 @@ public class ComprehensivePolicy extends InsurancePolicy {
         this.driverAge = policy.driverAge;
         this.level = policy.level;
     }
+
+    // lab-6
+    public String toDilimatedString() {
+        return super.toDilimatedString() + ","
+                + car.toDilimatedString() + ","
+                + expiryDate.toDilimatedString() + ","
+                + "Comprehensive," + driverAge + "," + level;
+    }
 }

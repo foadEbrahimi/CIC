@@ -1,4 +1,6 @@
-public class Car implements Cloneable {
+import java.io.Serializable;
+
+public class Car implements Cloneable, Serializable {
     protected String model;
     protected CarType type;
     protected int manuFacturingYear;
@@ -83,5 +85,10 @@ public class Car implements Cloneable {
     @Override
     public Car clone() throws CloneNotSupportedException {
         return (Car) super.clone();
+    }
+
+    // lab-6
+    public String toDilimatedString() {
+        return "car," + model + "," + type + "," + manuFacturingYear + "," + price;
     }
 }

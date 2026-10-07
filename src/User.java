@@ -1,8 +1,19 @@
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.EOFException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 
-public class User implements Cloneable, Comparable<User> {
+public class User implements Cloneable, Comparable<User>, Serializable {
     private static int idCounter = 0;
     private String name;
     private int userID;
@@ -95,7 +106,7 @@ public class User implements Cloneable, Comparable<User> {
         InsurancePolicy.carPriceRiseAll(this.policies, risePercent);
     }
 
-    HashMap<Integer,InsurancePolicy> filterByCarModel(String carModel) {
+    HashMap<Integer, InsurancePolicy> filterByCarModel(String carModel) {
         return InsurancePolicy.filterByCarModel(this.policies, carModel);
     }
 
@@ -517,5 +528,134 @@ public class User implements Cloneable, Comparable<User> {
             }
             System.out.printf("%-25s $%,.2f \t\t    $%,.2f%n", model, totalPayment, average);
         }
+    }
+
+    // lab-6
+    // binary-file
+    static HashMap<Integer, User> load(String fileName)
+            throws IOException, ClassNotFoundException {
+        HashMap<Integer, User> loadedUsers = new HashMap<Integer, User>();
+        ObjectInputStream inputFile = null;
+        try {
+            inputFile = new ObjectInputStream(
+                    Files.newInputStream(Paths.get(fileName)));
+            while (true) {
+                try {
+                    User user = (User) inputFile.readObject();
+                    loadedUsers.put(user.getUserID(), user);
+                } catch (EOFException ex) {
+                    break;
+                }
+            }
+        } finally {
+            if (inputFile != null) {
+                inputFile.close();
+            }
+        }
+        return loadedUsers;
+    }
+
+    static Boolean save(HashMap<Integer, User> usersList, String fileName)
+            throws IOException {
+        ObjectOutputStream outputFile = null;
+        try {
+            outputFile = new ObjectOutputStream(
+                    Files.newOutputStream(Paths.get(fileName)));
+            for (User user : usersList.values()) {
+                outputFile.writeObject(user);
+            }
+        } finally {
+            if (outputFile != null) {
+                outputFile.close();
+            }
+        }
+        return true;
+    }
+
+    // text-file
+    static HashMap<Integer, User> loadTextFile(String fileName)
+            throws IOException, PolicyException {
+        BufferedReader fileReader = new BufferedReader(new FileReader(fileName));
+        HashMap<Integer, User> loadedUsers = new HashMap<>();
+        String currentLine;
+        while ((currentLine = fileReader.readLine()) != null) {
+            currentLine = currentLine.trim();
+            if (currentLine.isEmpty())
+                continue;
+
+            String[] fields = currentLine.split(",", -1);
+            int userID = Integer.parseInt(fields[1]);
+            String name = fields[2];
+            int streetNum = Integer.parseInt(fields[4]);
+            String street = fields[5];
+            String suburb = fields[6];
+            String city = fields[7];
+            Address address = new Address(streetNum, street, suburb, city);
+            User user = new User(name, address);
+
+            int i = 8;
+            while (i < fields.length) {
+                int policyID = Integer.parseInt(fields[i + 1]);
+                String policyHolderName = fields[i + 2];
+                int numberOfClaims = Integer.parseInt(fields[i + 3]);
+
+                String carModel = fields[i + 5];
+                CarType carType = CarType.valueOf(fields[i + 6]);
+                int carYear = Integer.parseInt(fields[i + 7]);
+                double carPrice = Double.parseDouble(fields[i + 8]);
+                Car car = new Car(carModel, carType, carYear, carPrice);
+
+                int year = Integer.parseInt(fields[i + 10]);
+                int month = Integer.parseInt(fields[i + 11]);
+                int day = Integer.parseInt(fields[i + 12]);
+                MyDate date = new MyDate(year, month, day);
+
+                String policyType = fields[i + 13];
+                int policyLength;
+                InsurancePolicy policy;
+                if (policyType.equals("Third")) {
+                    String comments = fields[i + 14];
+                    policy = new ThirdPartyPolicy(policyHolderName, policyID, car, numberOfClaims, comments, date);
+                    // اینجا میشه نقطه ای که اطلاعات پالیسی تموم میشه و چون پالیسی از نوع third 15
+                    // تا فیلد داره پالیسی بعدیمون باید
+                    // از ایندکس 8 که شروع پالیسی ها هست + 15 بشه تا برسیم به پالیسی بعدی
+                    policyLength = 15;
+                } else {
+                    int driverAge = Integer.parseInt(fields[i + 14]);
+                    int level = Integer.parseInt(fields[i + 15]);
+                    policy = new ComprehensivePolicy(policyHolderName, policyID, car, numberOfClaims, driverAge, level,
+                            date);
+                    // اینجا هم همینطور اما 16 چون پالیسی از این نوع 16 تا فیلد داره
+                    policyLength = 16;
+                }
+                user.addPolicy(policy);
+                i += policyLength;
+            }
+            loadedUsers.put(userID, user);
+        }
+        fileReader.close();
+        return loadedUsers;
+    }
+
+    static Boolean saveTextFile(String fileName, HashMap<Integer, User> users)
+            throws IOException {
+        try (BufferedWriter fileWriter = new BufferedWriter(new FileWriter(fileName))) {
+            for (User user : users.values()) {
+                fileWriter.write(user.toDilimatedString());
+                fileWriter.write("\n");
+            }
+            return true;
+        } catch (IOException e) {
+            return false;
+        }
+    }
+
+    public String toDilimatedString() {
+        String result = "user," + this.userID + "," + this.name + ","
+                + this.address.toDilimatedString();
+        for (InsurancePolicy policy : this.policies.values()) {
+            result += "," + policy.toDilimatedString();
+        }
+        return result;
     }
 }

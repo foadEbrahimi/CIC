@@ -1,8 +1,11 @@
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 public class TestCode {
-        public static void runTests() throws CloneNotSupportedException, IllegalArgumentException, PolicyException {
+        public static void runTests()
+                        throws CloneNotSupportedException, IllegalArgumentException, PolicyException, IOException {
                 System.out.println("\n========================================");
                 System.out.println("   TEST SYSTEM (CORE + STANDARD + ADVANCE)  ");
                 System.out.println("========================================\n");
@@ -255,7 +258,6 @@ public class TestCode {
 
                 // lab-4
                 System.out.println("----LAB-4 TESTING----");
-
                 System.out.println("---User Policies Copy---");
                 ArrayList<InsurancePolicy> user1DeepCopyPolicies = u1.deepCopyPolicies();
                 ArrayList<InsurancePolicy> user1ShallowCopyPolicies = u1.shallowCopyPolicies();
@@ -365,6 +367,150 @@ public class TestCode {
                 }
                 company.printPolicies(u1.getUserID());
                 u1.print();
-        }
 
+                // lab-6
+                System.out.println("----LAB-6 TESTING----");
+                System.out.println("testing save and load policies binary file");
+                ThirdPartyPolicy policy1 = new ThirdPartyPolicy("Ali", 300001,
+                                new Car("Benz", CarType.SUV, 2023, 200000), 12, "Good", new MyDate(2028, 12, 5));
+                HashMap<Integer, InsurancePolicy> policies = new HashMap<Integer, InsurancePolicy>();
+                policies.put(policy1.getId(), policy1);
+                System.out.println("save to the file");
+                InsurancePolicy.save(policies, "policies.ser");
+                try {
+                        policies = InsurancePolicy.load("policies.ser");
+                        System.out.println("File loaded successfully");
+                } catch (FileNotFoundException e) {
+                        System.out.println("File not found");
+                } catch (ClassNotFoundException e) {
+                        System.out.println("Invalid class in file");
+                } catch (IOException e) {
+                        System.out.println("Error while reading the file");
+                }
+                System.out.println("print loadedPolicies");
+                for (InsurancePolicy policy : policies.values()) {
+                        policy.print();
+                }
+
+                System.out.println("testing save and load users binary file");
+                User userTest = new User("Foad", new Address(1, "A12", "B3", "Kerman"));
+                userTest.addPolicy(new ThirdPartyPolicy("Foad Test 1", 300002,
+                                new Car("Toyota", CarType.SED, 2020, 50000), 0, "ok", new MyDate(2028, 6, 1)));
+                HashMap<Integer, User> users = new HashMap<Integer, User>();
+                users.put(userTest.getUserID(), userTest);
+                System.out.println("save to the file");
+                User.save(users, "users.ser");
+
+                HashMap<Integer, User> loadedUsers = new HashMap<Integer, User>();
+                try {
+                        loadedUsers = User.load("users.ser");
+                        System.out.println("File loaded successfully");
+                } catch (FileNotFoundException e) {
+                        System.out.println("File not found");
+                } catch (ClassNotFoundException e) {
+                        System.out.println("Invalid class in file");
+                } catch (IOException e) {
+                        System.out.println("Error while reading the file");
+                }
+
+                System.out.println("print loadedUsers");
+                for (User user : loadedUsers.values()) {
+                        user.print();
+                }
+
+                System.out.println("testing save and load company binary file");
+                InsuranceCompany companyTest = new InsuranceCompany("Foad Company Test", "foad", "2222", 4);
+                companyTest.addUser(new User("Miad", new Address(5, "X", "Y", "Tehran")));
+
+                System.out.println("save to the file");
+                if (companyTest.save("company.ser")) {
+                        System.out.println("Saved successfully");
+                } else {
+                        System.out.println("Failed to save");
+                }
+
+                InsuranceCompany loadedCompany = new InsuranceCompany();
+                try {
+                        if (loadedCompany.load("company.ser")) {
+                                System.out.println("File loaded successfully");
+                        }
+                } catch (FileNotFoundException e) {
+                        System.out.println("File not found");
+                } catch (ClassNotFoundException e) {
+                        System.out.println("Invalid class in file");
+                } catch (IOException e) {
+                        System.out.println("Error while reading the file");
+                }
+
+                System.out.println(loadedCompany);
+
+                System.out.println("testing save and load policies text file");
+                ThirdPartyPolicy policyTest2 = new ThirdPartyPolicy("Foad", 300004,
+                                new Car("BMW", CarType.SUV, 2023, 140000), 0, "Premium", new MyDate(2027, 6, 1));
+                ComprehensivePolicy policyTest3 = new ComprehensivePolicy("Sara", 300005,
+                                new Car("Toyota", CarType.SED, 2020, 50000), 2, 25, 5, new MyDate(2027, 1, 1));
+
+                HashMap<Integer, InsurancePolicy> textPolicies = new HashMap<>();
+                textPolicies.put(policyTest2.getId(), policyTest2);
+                textPolicies.put(policyTest3.getId(), policyTest3);
+
+                if (InsurancePolicy.saveTextFile(textPolicies, "policies.txt")) {
+                        System.out.println("save to the file successfully");
+                } else {
+                        System.out.println("error while saving to the file");
+                }
+
+                HashMap<Integer, InsurancePolicy> loadedTextPolicies = InsurancePolicy.loadTextFile("policies.txt");
+                System.out.println("print policies after load from text file");
+                InsurancePolicy.printPolicies(loadedTextPolicies);
+
+                System.out.println("testing save and load users text file");
+                User user1Test = new User("User1Test", new Address(1, "A", "B", "Tehran"));
+                User user2Test = new User("user2Test", new Address(8, "C", "D", "Shiraz"));
+
+                user1Test.addPolicy(new ThirdPartyPolicy("User1Test", 300006,
+                                new Car("Honda", CarType.HATCH, 2022, 80000), 0, "Good", new MyDate(2028, 3, 1)));
+                user1Test.addPolicy(new ComprehensivePolicy("User1Test", 300007,
+                                new Car("Kia", CarType.SUV, 2021, 90000), 1, 30, 3, new MyDate(2028, 4, 1)));
+
+                HashMap<Integer, User> textUsers = new HashMap<>();
+                textUsers.put(user1Test.getUserID(), user1Test);
+                textUsers.put(user2Test.getUserID(), user2Test);
+
+                if (User.saveTextFile("users.txt", textUsers)) {
+                        System.out.println("save to the file successfully");
+                } else {
+                        System.out.println("error while saving to the file");
+                }
+
+                HashMap<Integer, User> loadedTextUsers = User.loadTextFile("users.txt");
+                System.out.println("print users after load from text file");
+                for (User user : loadedTextUsers.values()) {
+                        user.print();
+                }
+
+                System.out.println("testing save and load users text file");
+                InsuranceCompany textCompany = new InsuranceCompany("Text Company Text", "admin", "1234", 100);
+
+                User user10 = new User("User10", new Address(10, "E", "F", "Isfahan"));
+                user10.addPolicy(new ThirdPartyPolicy("UserC", 300008,
+                                new Car("Mazda", CarType.SED, 2022, 70000), 0, "ok", new MyDate(2028, 5, 1)));
+                textCompany.addUser(user10);
+
+                if (textCompany.saveTextFile("company.txt")) {
+                        System.out.println("save to the file successfully");
+                } else {
+                        System.out.println("error while saving to the file");
+                }
+
+                InsuranceCompany loadedTextCompany = new InsuranceCompany();
+                if (loadedTextCompany.loadTextFile("company.txt")) {
+                        System.out.println("file loaded successfully");
+                } else {
+                        System.out.println("error to load company from the file");
+                }
+                System.out.println("print company text after loading from the file");
+                System.out.println(loadedTextCompany.getName());
+                loadedTextCompany.print();
+        }
 }

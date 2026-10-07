@@ -1,4 +1,6 @@
-public class Address implements Cloneable, Comparable<Address> {
+import java.io.Serializable;
+
+public class Address implements Cloneable, Comparable<Address>, Serializable {
     private int streetNum;
     private String street;
     private String suburb;
@@ -91,6 +93,11 @@ public class Address implements Cloneable, Comparable<Address> {
 
     public int compareTo(Address otherCity) {
         return this.city.compareTo(otherCity.getCity());
+    }
+
+    // lab-6
+    public String toDilimatedString() {
+        return "address," + streetNum + "," + street + "," + suburb + "," + city;
     }
 
 }

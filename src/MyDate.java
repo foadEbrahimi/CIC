@@ -1,6 +1,7 @@
+import java.io.Serializable;
 import java.time.LocalDate;
 
-public class MyDate implements Cloneable, Comparable<MyDate> {
+public class MyDate implements Cloneable, Comparable<MyDate>, Serializable {
     private int year;
     private int month;
     private int day;
@@ -88,5 +89,10 @@ public class MyDate implements Cloneable, Comparable<MyDate> {
         LocalDate thisDate = LocalDate.of(this.year, this.month, this.day);
         LocalDate otherDate = LocalDate.of(other.year, other.month, other.day);
         return thisDate.compareTo(otherDate);
+    }
+
+    // lab-6
+    public String toDilimatedString() {
+        return "date," + year + "," + month + "," + day;
     }
 }

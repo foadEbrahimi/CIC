@@ -1,14 +1,23 @@
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.EOFException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public abstract class InsurancePolicy implements Cloneable, Comparable<InsurancePolicy> {
+public abstract class InsurancePolicy implements Cloneable, Comparable<InsurancePolicy>, Serializable {
     protected int id;
     protected String policyHolderName;
     protected Car car;
     protected int numberOfClaims;
     protected MyDate expiryDate;
-    public int driverAge;
-    public int level;
 
     public InsurancePolicy(String policyHolderName, int id,
             Car car,
@@ -290,4 +299,100 @@ public abstract class InsurancePolicy implements Cloneable, Comparable<Insurance
         return shallowCopyListHashMap;
     }
 
+    // lab-6
+    static HashMap<Integer, InsurancePolicy> load(String fileName)
+            throws IOException, ClassNotFoundException {
+        HashMap<Integer, InsurancePolicy> loadedPolicies = new HashMap<>();
+        ObjectInputStream inputFile = null;
+        try {
+            inputFile = new ObjectInputStream(Files.newInputStream(Paths.get(fileName)));
+            while (true) {
+                try {
+                    InsurancePolicy policy = (InsurancePolicy) inputFile.readObject();
+                    loadedPolicies.put(policy.getId(), policy);
+                } catch (EOFException e) {
+                    break;
+                }
+            }
+        } finally {
+            if (inputFile != null) {
+                inputFile.close();
+            }
+        }
+        return loadedPolicies;
+    }
+
+    static Boolean save(HashMap<Integer, InsurancePolicy> list, String fileName)
+            throws IOException {
+        ObjectOutputStream outputFile = null;
+        try {
+            outputFile = new ObjectOutputStream(
+                    Files.newOutputStream(Paths.get(fileName)));
+            for (InsurancePolicy policy : list.values()) {
+                outputFile.writeObject(policy);
+            }
+        } finally {
+            if (outputFile != null) {
+                outputFile.close();
+            }
+        }
+        return true;
+    }
+
+    public String toDilimatedString() {
+        return "policy," + id + "," + policyHolderName + "," + numberOfClaims;
+    }
+
+    static HashMap<Integer, InsurancePolicy> loadTextFile(String fileName)
+            throws IOException, PolicyException {
+        BufferedReader fileReader = new BufferedReader(new FileReader(fileName));
+        HashMap<Integer, InsurancePolicy> loadedPolicies = new HashMap<>();
+        String currentLine;
+        while ((currentLine = fileReader.readLine()) != null) {
+            currentLine = currentLine.trim();
+            if (currentLine.isEmpty())
+                continue;
+            String[] fields = currentLine.split(",", -1);
+
+            int id = Integer.parseInt(fields[1]);
+            String name = fields[2];
+            int numberOfClaims = Integer.parseInt(fields[3]);
+
+            String carModel = fields[5];
+            CarType carType = CarType.valueOf(fields[6]);
+            int carYear = Integer.parseInt(fields[7]);
+            double carPrice = Double.parseDouble(fields[8]);
+            Car car = new Car(carModel, carType, carYear, carPrice);
+
+            int year = Integer.parseInt(fields[10]);
+            int month = Integer.parseInt(fields[11]);
+            int day = Integer.parseInt(fields[12]);
+            MyDate date = new MyDate(year, month, day);
+
+            String type = fields[13];
+            InsurancePolicy policy;
+            if (type.equals("Third")) {
+                String comments = fields[14];
+                policy = new ThirdPartyPolicy(name, id, car, numberOfClaims, comments, date);
+            } else {
+                int driverAge = Integer.parseInt(fields[14]);
+                int level = Integer.parseInt(fields[15]);
+                policy = new ComprehensivePolicy(name, id, car, numberOfClaims, driverAge, level, date);
+            }
+            loadedPolicies.put(id, policy);
+        }
+        fileReader.close();
+        return loadedPolicies;
+    }
+
+    static Boolean saveTextFile(HashMap<Integer, InsurancePolicy> policies, String fileName)
+            throws IOException {
+        BufferedWriter fileWriter = new BufferedWriter(new FileWriter(fileName));
+        for (InsurancePolicy policy : policies.values()) {
+            fileWriter.write(policy.toDilimatedString());
+            fileWriter.write("\n");
+        }
+        fileWriter.close();
+        return true;
+    }
 }
